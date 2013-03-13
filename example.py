@@ -3,7 +3,7 @@
 import json
 from datalanche import *
 
-API_KEY = '16YNL0N2QVS9kx2y07MgcA=='
+API_KEY = ''
 API_SECRET = ''
 DATASET_NAME = 'medical_codes_ndc'
 
