@@ -3,6 +3,7 @@
 from datalanche import *
 import json
 import os
+import sys
 
 def is_boolean(s):
     if s == True or s == False:
@@ -173,12 +174,16 @@ def read(connection, test):
         print repr(e)
     return success
 
-validKey = '16YNL0N2QVS9kx2y07MgcA=='
-dirname = '../client-tests'
-connection = DLConnection()
+if len(sys.argv) != 3:
+    print 'ERROR: invalid format: python test.py <apikey> <testdir>'
+    sys.exit(1)
 
 num_passed = 0
 total_tests = 0
+valid_key = sys.argv[1]
+dirname = sys.argv[2]
+
+connection = DLConnection()
 
 files = os.listdir(dirname)
 for filename in sorted(files):
@@ -197,7 +202,7 @@ for filename in sorted(files):
                 continue
 
             if test['parameters']['key'] == 'valid_key':
-                test['parameters']['key'] = validKey;
+                test['parameters']['key'] = valid_key;
 
             success = False
 
