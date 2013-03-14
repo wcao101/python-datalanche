@@ -2,6 +2,7 @@
 
 from enum import Enum
 import json
+import collections
 
 DLFilterOp = Enum(
     'AND',          # and
@@ -37,11 +38,15 @@ class DLFilter(object):
         if isinstance(right, DLFilter):
             right = right.json()
 
-        return {
-            'left': left,
-            'op': str(self.operator).lower(),
-            'right': right
-        }
+        newjson = collections.OrderedDict()
+        if left != None:
+            newjson['left'] = left
+        if self.operator != None:
+            newjson['op'] = str(self.operator).lower()
+        if right != None:
+            newjson['right'] = right
+
+        return newjson
 
     def __str__(self):
         return json.dumps(self.json())
