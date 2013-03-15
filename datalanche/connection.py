@@ -44,8 +44,7 @@ class DLConnection(object):
     def __init__(self):
         self.auth_key = ''
         self.auth_secret = ''
-        #self.url = 'http://api.datalanche.com'
-        self.url = 'http://localhost:3000'
+        self.url = 'http://api.datalanche.com'
 
     def authenticate(self, key, secret):
         self.auth_key = key
