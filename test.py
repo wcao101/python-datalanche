@@ -174,8 +174,8 @@ def read(connection, test):
         print repr(e)
     return success
 
-if len(sys.argv) != 3:
-    print 'ERROR: invalid format: python test.py <apikey> <testdir>'
+if len(sys.argv) < 3 or len(sys.argv) > 5:
+    print 'ERROR: invalid format: python test.py <apikey> <testdir> [ <host> <port> ]'
     sys.exit(1)
 
 num_passed = 0
@@ -183,7 +183,15 @@ total_tests = 0
 valid_key = sys.argv[1]
 dirname = sys.argv[2]
 
-connection = DLConnection()
+host = None
+if len(sys.argv) >= 4:
+    host = sys.argv[3]
+
+port = None
+if len(sys.argv) >= 5:
+    port = sys.argv[4]
+
+connection = DLConnection(host = host, port = port)
 
 files = os.listdir(dirname)
 for filename in sorted(files):

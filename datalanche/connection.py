@@ -41,10 +41,14 @@ def list2str(value):
     return newstr
 
 class DLConnection(object):
-    def __init__(self):
+    def __init__(self, host = None, port = None):
         self.auth_key = ''
         self.auth_secret = ''
-        self.url = 'http://api.datalanche.com'
+        self.url = 'http://api.datalanche.com';
+        if host != None:
+            self.url = 'http://' + host;
+        if port != None:
+           self.url = self.url + ':' + str(port) 
 
     def authenticate(self, key, secret):
         self.auth_key = key
