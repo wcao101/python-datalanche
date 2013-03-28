@@ -41,14 +41,16 @@ def list2str(value):
     return newstr
 
 class DLConnection(object):
-    def __init__(self, host = None, port = None):
+    def __init__(self, host = None, port = None, verify_ssl = True):
         self.auth_key = ''
         self.auth_secret = ''
-        self.url = 'http://api.datalanche.com';
+        self.client = requests.Session()
+        self.url = 'https://api.datalanche.com'
+        self.verify_ssl = verify_ssl
         if host != None:
-            self.url = 'http://' + host;
+            self.url = 'https://' + host
         if port != None:
-           self.url = self.url + ':' + str(port) 
+            self.url = self.url + ':' + str(port) 
 
     def authenticate(self, key, secret):
         self.auth_key = key
@@ -59,7 +61,7 @@ class DLConnection(object):
         url = self.url + '/list'
         parameters = { 'key': self.auth_key }
 
-        r = requests.get(url, params = parameters)
+        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json()
@@ -68,7 +70,7 @@ class DLConnection(object):
         url = self.url + '/' + dataset_name + '/schema'
         parameters = { 'key': self.auth_key }
 
-        r = requests.get(url, params = parameters)
+        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json()
@@ -91,7 +93,7 @@ class DLConnection(object):
         if params and params.total != None:
             parameters['total'] = str(params.total).lower()
 
-        r = requests.get(url, params = parameters)
+        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json()

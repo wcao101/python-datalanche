@@ -174,8 +174,8 @@ def read(connection, test):
         print repr(e)
     return success
 
-if len(sys.argv) < 3 or len(sys.argv) > 5:
-    print 'ERROR: invalid format: python test.py <apikey> <testdir> [ <host> <port> ]'
+if len(sys.argv) < 3 or len(sys.argv) > 6:
+    print 'ERROR: invalid format: python test.py <apikey> <testdir> [ <host> <port> <verify_ssl> ]'
     sys.exit(1)
 
 num_passed = 0
@@ -191,7 +191,15 @@ port = None
 if len(sys.argv) >= 5:
     port = sys.argv[4]
 
-connection = DLConnection(host = host, port = port)
+verify_ssl = True
+if len(sys.argv) >= 6:
+    verify_ssl = sys.argv[5].lower()
+    if verify_ssl == '0' or verify_ssl == 'false':
+        verify_ssl = False
+    else:
+        verify_ssl = True
+
+connection = DLConnection(host = host, port = port, verify_ssl = verify_ssl)
 
 files = os.listdir(dirname)
 for filename in sorted(files):
