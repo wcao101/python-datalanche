@@ -23,35 +23,86 @@ def is_number(s):
 def is_string(s):
     return isinstance(s, basestring)
 
-def convert_filter(value):
-    left = None
-    op = None
-    right = None
-    
-    if 'left' in value:
-        left = value['left']
-    if 'op' in value:
-        op = value['op']
-        if op == 'and':             op = DLFilterOp.AND
-        elif op == 'or':            op = DLFilterOp.OR
-        elif op == 'eq':            op = DLFilterOp.EQ
-        elif op == 'not_eq':        op = DLFilterOp.NOT_EQ
-        elif op == 'gt':            op = DLFilterOp.GT
-        elif op == 'gte':           op = DLFilterOp.GTE
-        elif op == 'lt':            op = DLFilterOp.LT
-        elif op == 'lte':           op = DLFilterOp.LTE
-        elif op == 'in':            op = DLFilterOp.IN
-        elif op == 'not_in':        op = DLFilterOp.NOT_IN
-        elif op == 'ew':            op = DLFilterOp.EW
-        elif op == 'not_ew':        op = DLFilterOp.NOT_EW
-        elif op == 'contains':      op = DLFilterOp.CONTAINS
-        elif op == 'not_contains':  op = DLFilterOp.NOT_CONTAINS
-        elif op == 'sw':            op = DLFilterOp.SW
-        elif op == 'not_sw':        op = DLFilterOp.NOT_SW
-    if 'right' in value:
-        right = value['right']
+def convert_filter(filter):
 
-    return DLFilter(left, op, right)
+    print 'START FILTER: ' + str(filter)
+
+    if isinstance(filter, collections.OrderedDict) == False:
+        return filter
+
+    has_not = False
+
+    keys = filter.keys()
+    field = keys[0]
+    op_expr = filter[keys[0]]
+
+    keys = op_expr.keys()
+    operator = keys[0]
+    value = op_expr[operator]
+
+    if operator == '$not':
+        has_not = True
+        keys = value.keys()
+        operator = keys[0]
+        value = value[operator]
+
+    new_filter = DLFilter()
+
+    if operator == '$and':
+        new_filter.field(field).bool_and(value)
+    elif operator == '$ends':
+        if has_not == False:
+            new_filter.field(field).ends_with(value)
+        else:
+            new_filter.field(field).not_ends_with(value)
+    elif operator == '$contains':
+        if has_not == False:
+            new_filter.field(field).contains(value)
+        else:
+            new_filter.field(field).not_contains(value)
+    elif operator == '$eq':
+        if has_not == False:
+            new_filter.field(field).equals(value)
+        else:
+            new_filter.field(field).not_equals(value)
+    elif operator == '$gt':
+        if has_not == False:
+            new_filter.field(field).greater_than(value)
+        else:
+            new_filter.field(field).less_than_equal(value)
+    elif operator == '$gte':
+        if has_not == False:
+            new_filter.field(field).greater_than_equal(value)
+        else:
+            new_filter.field(field).less_than(value)
+    elif operator == '$in':
+        if has_not == False:
+            new_filter.field(field).any_in(value)
+        else:
+            new_filter.field(field).not_any_in(value)
+    elif operator == '$lt':
+        if has_not == False:
+            new_filter.field(field).less_than(value)
+        else:
+            new_filter.field(field).greater_than_equal(value)
+    elif operator == '$lte':
+        if has_not == False:
+            new_filter.field(field).less_than_equal(value)
+        else:
+            new_filter.field(field).greater_than(value)
+    elif operator == '$or':
+        new_filter.field(field).bool_or(value)
+    elif operator == '$starts':
+        if has_not == False:
+            new_filter.field(field).starts_with(value)
+        else:
+            new_filter.field(field).not_starts_with(value)
+
+    # TODO: and, or
+
+    print 'FILTER: ' + str(new_filter)
+
+    return new_filter
 
 def convert_sort(value):
     newstr = ''
@@ -206,7 +257,7 @@ connection = DLConnection(host = host, port = port, verify_ssl = verify_ssl)
 
 files = os.listdir(dirname)
 for filename in sorted(files):
-    if filename.endswith('.json') == True:
+    if filename.endswith('read-filter-not.json') == True:
 
         jsondata = json.load(open(dirname + '/' + filename), object_pairs_hook=collections.OrderedDict)
         num_tests = len(jsondata['tests'])

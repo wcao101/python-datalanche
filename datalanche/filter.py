@@ -2,6 +2,7 @@
 
 import json
 import collections
+from exception import DLException
 
 class DLFilter(object):
     def __init__(self):
@@ -15,15 +16,14 @@ class DLFilter(object):
         return json.dumps(self.json())
 
     def json(self):
-        # return empty when not formatted correctly
-        if (self._operator == None):
-            return collections.OrderedDict()
 
         if self._operator == '$and' or self._operator == '$or':
 
-            # return empty when not formatted correctly
             if self._filters == None:
-                return collections.OrderedDict()
+                raise Exception('filter list = None in filter')
+
+            if self._field != None:
+                raise Exception('field cannot be set when $and, $or used')
 
             json_list = list()
             for i in range(0, len(self._filters)):
@@ -42,18 +42,21 @@ class DLFilter(object):
 
         else:
 
-            # return empty when not formatted correctly
-            if self._field == None or self._value == None:
-                return collections.OrderedDict()
+            if self._field == None:
+                raise Exception('field = None in filter')
+            if self._operator == None:
+                raise Exception('operator = None in filter')
+            if self._value == None:
+                raise Exception('value = None in filter')
 
-            opExpression = collections.OrderedDict()
-            opExpression[str(self._operator)] = self._value
+            op_expr = collections.OrderedDict()
+            op_expr[str(self._operator)] = self._value
 
             if self._hasNot == True:
-                opExpression = { '$not': opExpression }
+                op_expr = { '$not': op_expr }
 
             json = collections.OrderedDict()
-            json[str(self._field)] = opExpression
+            json[str(self._field)] = op_expr
 
             return json
 
