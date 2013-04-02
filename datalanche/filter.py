@@ -20,10 +20,10 @@ class DLFilter(object):
         if self._operator == '$and' or self._operator == '$or':
 
             if self._filters == None:
-                raise Exception('filter list = None in filter')
+                raise Exception('filter list = None in DLFilter')
 
             if self._field != None:
-                raise Exception('field cannot be set when $and, $or used')
+                raise Exception('field cannot be set when $and, $or used in DLFilter')
 
             json_list = list()
             for i in range(0, len(self._filters)):
@@ -43,11 +43,11 @@ class DLFilter(object):
         else:
 
             if self._field == None:
-                raise Exception('field = None in filter')
+                raise Exception('field = None in DLFilter')
             if self._operator == None:
-                raise Exception('operator = None in filter')
+                raise Exception('operator = None in DLFilter')
             if self._value == None:
-                raise Exception('value = None in filter')
+                raise Exception('value = None in DLFilter')
 
             op_expr = collections.OrderedDict()
             op_expr[str(self._operator)] = self._value

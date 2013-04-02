@@ -23,18 +23,16 @@ def is_number(s):
 def is_string(s):
     return isinstance(s, basestring)
 
-def convert_filter(filter):
+def convert_simple_filter(filter):
 
-    print 'START FILTER: ' + str(filter)
-
-    if isinstance(filter, collections.OrderedDict) == False:
+    if isinstance(filter, dict) == False:
         return filter
 
     has_not = False
 
     keys = filter.keys()
     field = keys[0]
-    op_expr = filter[keys[0]]
+    op_expr = filter[field]
 
     keys = op_expr.keys()
     operator = keys[0]
@@ -48,9 +46,7 @@ def convert_filter(filter):
 
     new_filter = DLFilter()
 
-    if operator == '$and':
-        new_filter.field(field).bool_and(value)
-    elif operator == '$ends':
+    if operator == '$ends':
         if has_not == False:
             new_filter.field(field).ends_with(value)
         else:
@@ -90,19 +86,35 @@ def convert_filter(filter):
             new_filter.field(field).less_than_equal(value)
         else:
             new_filter.field(field).greater_than(value)
-    elif operator == '$or':
-        new_filter.field(field).bool_or(value)
     elif operator == '$starts':
         if has_not == False:
             new_filter.field(field).starts_with(value)
         else:
             new_filter.field(field).not_starts_with(value)
 
-    # TODO: and, or
-
-    print 'FILTER: ' + str(new_filter)
-
     return new_filter
+
+def convert_filter(filter):
+
+    if isinstance(filter, dict) == False:
+        return filter
+
+    keys = filter.keys()
+    operator = keys[0]
+
+    if operator == '$and' or operator == '$or':
+        filter_list = filter[operator]
+
+        new_filter_list = list()
+        for f in filter_list:
+            new_filter_list.append(convert_filter(f))
+
+        if operator == '$and':
+            return DLFilter().bool_and(new_filter_list)
+        else:
+            return DLFilter().bool_or(new_filter_list)
+    else:
+        return convert_simple_filter(filter)
 
 def convert_sort(value):
     newstr = ''
@@ -257,7 +269,7 @@ connection = DLConnection(host = host, port = port, verify_ssl = verify_ssl)
 
 files = os.listdir(dirname)
 for filename in sorted(files):
-    if filename.endswith('read-filter-not.json') == True:
+    if filename.endswith('.json') == True:
 
         jsondata = json.load(open(dirname + '/' + filename), object_pairs_hook=collections.OrderedDict)
         num_tests = len(jsondata['tests'])
