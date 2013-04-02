@@ -5,13 +5,15 @@ from datalanche import *
 
 API_KEY = ''
 API_SECRET = ''
-DATASET_NAME = 'medical_codes_ndc'
 
 try:
     connection = DLConnection()
     connection.authenticate(API_KEY, API_SECRET)
 
-    data = connection.read(DATASET_NAME)
+    # Uses default parameters however "dataset" is required.
+    params = DLReadParams(dataset = 'medical_codes_ndc')
+
+    data = connection.read(params)
 
     print json.dumps(data, sort_keys = False, indent = 4)
 except DLException as e:

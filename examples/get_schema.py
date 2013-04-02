@@ -5,13 +5,12 @@ from datalanche import *
 
 API_KEY = ''
 API_SECRET = ''
-DATASET_NAME = 'medical_codes_ndc'
 
 try:
     connection = DLConnection()
     connection.authenticate(API_KEY, API_SECRET)
 
-    data = connection.get_schema(DATASET_NAME)
+    data = connection.get_schema('medical_codes_ndc')
 
     print json.dumps(data, sort_keys = False, indent = 4)
 except DLException as e:

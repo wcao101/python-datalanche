@@ -5,7 +5,6 @@ from datalanche import *
 
 API_KEY = ''
 API_SECRET = ''
-DATASET_NAME = 'medical_codes_ndc'
 
 try:
     connection = DLConnection()

@@ -5,13 +5,13 @@ from datalanche import *
 
 API_KEY = ''
 API_SECRET = ''
-DATASET_NAME = 'medical_codes_ndc'
 
 try:
     connection = DLConnection()
     connection.authenticate(API_KEY, API_SECRET)
 
     params = DLReadParams()
+    params.dataset = 'medical_codes_ndc'
     params.fields = ['dosage_form', 'route', 'product_type']
     params.limit = 5
     params.skip = 0
@@ -24,7 +24,7 @@ try:
     # You can also set params.sort to a list instead of using the helper methods.
     params.sort = ['dosage_form:desc', 'product_type:asc']
 
-    data = connection.read(DATASET_NAME, params)
+    data = connection.read(params)
 
     print json.dumps(data, sort_keys = False, indent = 4)
 except DLException as e:

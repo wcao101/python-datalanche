@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datalanche import *
+import collections
 import json
 import os
 import sys
@@ -139,7 +140,7 @@ def get_schema(connection, test):
     success = False
     try:
         connection.authenticate(test['parameters']['key'], test['parameters']['secret'])
-        data = connection.get_schema(test['dataset'])
+        data = connection.get_schema(test['parameters']['dataset'])
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -153,6 +154,8 @@ def read(connection, test):
         connection.authenticate(test['parameters']['key'], test['parameters']['secret'])
 
         params = DLReadParams()
+        if 'dataset' in test['parameters']:
+            params.dataset = test['parameters']['dataset']
         if 'fields' in test['parameters']:
             params.fields = test['parameters']['fields']
         if 'filter' in test['parameters']:
@@ -166,7 +169,7 @@ def read(connection, test):
         if 'total' in test['parameters']:
             params.total = test['parameters']['total']
 
-        data = connection.read(test['dataset'], params)
+        data = connection.read(params)
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -205,7 +208,7 @@ files = os.listdir(dirname)
 for filename in sorted(files):
     if filename.endswith('.json') == True:
 
-        jsondata = json.load(open(dirname + '/' + filename))
+        jsondata = json.load(open(dirname + '/' + filename), object_pairs_hook=collections.OrderedDict)
         num_tests = len(jsondata['tests'])
         total_tests = total_tests + num_tests
 

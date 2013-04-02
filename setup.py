@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-required = ['requests == 1.1', 'enum == 0.4.4']
+required = ['requests == 1.2']
 
 setup(
     author='Datalanche, Inc.',

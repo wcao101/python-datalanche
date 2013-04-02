@@ -2,6 +2,7 @@
 
 class DLReadParams(object):
     def __init__(self,
+        dataset = None,
         fields = None,
         filter = None,
         limit = None,
@@ -9,6 +10,7 @@ class DLReadParams(object):
         sort = None,
         total = None):
 
+        self.dataset = dataset
         self.fields = fields
         self.filter = filter
         self.limit = limit

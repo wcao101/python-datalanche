@@ -5,25 +5,23 @@ from datalanche import *
 
 API_KEY = ''
 API_SECRET = ''
-DATASET_NAME = 'medical_codes_ndc'
 
 try:
     connection = DLConnection()
     connection.authenticate(API_KEY, API_SECRET)
 
-    readFilter = DLFilter(
-        DLFilter(
-            DLFilter('dosage_form', DLFilterOp.EQ, 'capsule'),
-            DLFilterOp.OR,
-            DLFilter('dosage_form', DLFilterOp.EQ, 'tablet')
-        ),
-        DLFilterOp.AND,
-        DLFilter('product_type', DLFilterOp.CONTAINS, 'esc')
-    )
+    readFilter = DLFilter()
+    readFilter.bool_and([
+        DLFilter().bool_or([
+            DLFilter().field('dosage_form').equals('capsule'),
+            DLFilter().field('dosage_form').equals('tablet')
+        ]),
+        DLFilter().field('product_type').contains('esc')
+    ])
 
-    params = DLReadParams(limit = 5, filter = readFilter)
+    params = DLReadParams(dataset = 'medical_codes_ndc', filter = readFilter, limit = 5)
 
-    data = connection.read(DATASET_NAME, params)
+    data = connection.read(params)
 
     print json.dumps(data, sort_keys = False, indent = 4)
 except DLException as e:

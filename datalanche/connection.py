@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import collections
 from exception import DLException
 
 def is_boolean(s):
@@ -64,22 +65,27 @@ class DLConnection(object):
         r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
-        return r.json()
+        return r.json(object_pairs_hook=collections.OrderedDict)
 
     def get_schema(self, dataset_name):
-        url = self.url + '/' + dataset_name + '/schema'
-        parameters = { 'key': self.auth_key }
+        url = self.url + '/schema'
+        parameters = {
+            'dataset': dataset_name,
+            'key': self.auth_key
+        }
 
         r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
-        return r.json()
+        return r.json(object_pairs_hook=collections.OrderedDict)
 
-    def read(self, dataset_name, params = None):
-        url = self.url + '/' + dataset_name + '/read'
+    def read(self, params = None):
+        url = self.url + '/read'
 
         parameters = { 'key': self.auth_key }
 
+        if params and params.dataset != None:
+            parameters['dataset'] = params.dataset
         if params and params.fields != None:
             parameters['fields'] = list2str(params.fields)
         if params and params.filter != None:
@@ -96,4 +102,4 @@ class DLConnection(object):
         r = self.client.get(url, params = parameters, verify = self.verify_ssl)
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
-        return r.json()
+        return r.json(object_pairs_hook=collections.OrderedDict)
