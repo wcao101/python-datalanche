@@ -22,7 +22,7 @@ try:
     params.sort_asc('product_type')
 
     # You can also set params.sort to a list instead of using the helper methods.
-    params.sort = ['dosage_form:desc', 'product_type:asc']
+    params.sort = ['dosage_form:$desc', 'product_type:$asc']
 
     data = connection.read(params)
 
