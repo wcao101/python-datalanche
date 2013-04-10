@@ -24,6 +24,7 @@ class DLReadParams(object):
         if isinstance(self.sort, list) == False:
             raise Exception('DLReadParams.sort must be a list, but it is not')
         self.sort.append(field + ':asc')
+        return self # method chaining
 
     def sort_desc(self, field):
         if self.sort == None:
@@ -31,3 +32,4 @@ class DLReadParams(object):
         if isinstance(self.sort, list) == False:
             raise Exception('DLReadParams.sort must be a list, but it is not')
         self.sort.append(field + ':desc')
+        return self # method chaining
