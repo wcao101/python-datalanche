@@ -130,13 +130,7 @@ def convert_sort(value):
             elif is_number(value[i]) or is_string(value[i]):
                 newstr = newstr + str(value[i])
             else:
-                if 'field' in value[i]:
-                    if 'field' in value[i]:
-                        newstr = newstr + str(value[i]['field'])
-                    if 'type' in value[i]:
-                        newstr = newstr + ':' + str(value[i]['type'])
-                else:
-                    newstr = newstr + str(value[i])
+                newstr = newstr + str(value[i])
 
             if i < len(value) - 1:
                 newstr = newstr + ','
