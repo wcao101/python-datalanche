@@ -21,9 +21,13 @@ class DLReadParams(object):
     def sort_asc(self, field):
         if self.sort == None:
             self.sort = list()
+        if isinstance(self.sort, list) == False:
+            raise Exception('DLReadParams.sort must be a list, but it is not')
         self.sort.append(field + ':asc')
 
     def sort_desc(self, field):
         if self.sort == None:
             self.sort = list()
+        if isinstance(self.sort, list) == False:
+            raise Exception('DLReadParams.sort must be a list, but it is not')
         self.sort.append(field + ':desc')
