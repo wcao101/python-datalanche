@@ -184,7 +184,8 @@ def handle_exception(e, test):
 def get_list(client, test):
     success = False
     try:
-        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
         data = client.get_list()
         success = handle_test(data, test)
     except DLException as e:
@@ -196,7 +197,8 @@ def get_list(client, test):
 def get_schema(client, test):
     success = False
     try:
-        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
         data = client.get_schema(test['parameters']['dataset'])
         success = handle_test(data, test)
     except DLException as e:
@@ -208,7 +210,8 @@ def get_schema(client, test):
 def read(client, test):
     success = False
     try:
-        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
 
         params = DLReadParams()
         if 'dataset' in test['parameters']:

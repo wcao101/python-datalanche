@@ -42,9 +42,9 @@ def list2str(value):
     return newstr
 
 class DLClient(object):
-    def __init__(self, host = None, port = None, verify_ssl = True):
-        self.auth_key = ''
-        self.auth_secret = ''
+    def __init__(self, key = '', secret = '', host = None, port = None, verify_ssl = True):
+        self.auth_key = key
+        self.auth_secret = secret
         self.client = requests.Session()
         self.url = 'https://api.datalanche.com'
         self.verify_ssl = verify_ssl
@@ -53,11 +53,6 @@ class DLClient(object):
         if port != None:
             self.url = self.url + ':' + str(port) 
 
-    def authenticate(self, key, secret):
-        self.auth_key = key
-        self.auth_secret = secret
-        # TODO: perform OAuth
-        
     def get_list(self):
         url = self.url + '/list'
         parameters = { 'key': self.auth_key }

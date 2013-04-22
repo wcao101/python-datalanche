@@ -3,12 +3,8 @@
 import json
 from datalanche import *
 
-API_KEY = ''
-API_SECRET = ''
-
 try:
-    client = DLClient()
-    client.authenticate(API_KEY, API_SECRET)
+    client = DLClient(key='your_api_key', secret='your_api_secret')
 
     data = client.get_schema('medical_codes_ndc')
 
