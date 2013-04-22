@@ -181,11 +181,11 @@ def handle_exception(e, test):
         return True
     return False
 
-def get_list(connection, test):
+def get_list(client, test):
     success = False
     try:
-        connection.authenticate(test['parameters']['key'], test['parameters']['secret'])
-        data = connection.get_list()
+        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        data = client.get_list()
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -193,11 +193,11 @@ def get_list(connection, test):
         print repr(e)
     return success
 
-def get_schema(connection, test):
+def get_schema(client, test):
     success = False
     try:
-        connection.authenticate(test['parameters']['key'], test['parameters']['secret'])
-        data = connection.get_schema(test['parameters']['dataset'])
+        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        data = client.get_schema(test['parameters']['dataset'])
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -205,10 +205,10 @@ def get_schema(connection, test):
         print repr(e)
     return success
 
-def read(connection, test):
+def read(client, test):
     success = False
     try:
-        connection.authenticate(test['parameters']['key'], test['parameters']['secret'])
+        client.authenticate(test['parameters']['key'], test['parameters']['secret'])
 
         params = DLReadParams()
         if 'dataset' in test['parameters']:
@@ -226,7 +226,7 @@ def read(connection, test):
         if 'total' in test['parameters']:
             params.total = test['parameters']['total']
 
-        data = connection.read(params)
+        data = client.read(params)
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -259,7 +259,7 @@ if len(sys.argv) >= 6:
     else:
         verify_ssl = True
 
-connection = DLConnection(host = host, port = port, verify_ssl = verify_ssl)
+client = DLClient(host = host, port = port, verify_ssl = verify_ssl)
 
 files = os.listdir(dirname)
 for filename in sorted(files):
@@ -283,11 +283,11 @@ for filename in sorted(files):
             success = False
 
             if test['method'] == 'list':
-                success = get_list(connection, test)
+                success = get_list(client, test)
             elif test['method'] == 'schema':
-                success = get_schema(connection, test)
+                success = get_schema(client, test)
             elif test['method'] == 'read':
-                success = read(connection, test)
+                success = read(client, test)
             else:
                 print 'ERROR: ' + test['method'] + ' method not found'
 

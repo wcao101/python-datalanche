@@ -41,7 +41,7 @@ def list2str(value):
     
     return newstr
 
-class DLConnection(object):
+class DLClient(object):
     def __init__(self, host = None, port = None, verify_ssl = True):
         self.auth_key = ''
         self.auth_secret = ''
