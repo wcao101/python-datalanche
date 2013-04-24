@@ -3,6 +3,7 @@
 import requests
 import collections
 from exception import DLException
+from requests.auth import HTTPBasicAuth
 
 def is_boolean(s):
     if s == True or s == False:
@@ -55,21 +56,26 @@ class DLClient(object):
 
     def get_list(self):
         url = self.url + '/list'
-        parameters = { 'key': self.auth_key }
 
-        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
+        r = self.client.get(
+            url,
+            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+            verify = self.verify_ssl
+        )
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
 
     def get_schema(self, dataset_name):
         url = self.url + '/schema'
-        parameters = {
-            'dataset': dataset_name,
-            'key': self.auth_key
-        }
+        parameters = { 'dataset': dataset_name }
 
-        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
+        r = self.client.get(
+            url,
+            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+            params = parameters,
+            verify = self.verify_ssl
+        )
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
@@ -77,7 +83,7 @@ class DLClient(object):
     def read(self, params = None):
         url = self.url + '/read'
 
-        parameters = { 'key': self.auth_key }
+        parameters = {}
 
         if params and params.dataset != None:
             parameters['dataset'] = params.dataset
@@ -94,7 +100,12 @@ class DLClient(object):
         if params and params.total != None:
             parameters['total'] = str(params.total).lower()
 
-        r = self.client.get(url, params = parameters, verify = self.verify_ssl)
+        r = self.client.get(
+            url,
+            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+            params = parameters,
+            verify = self.verify_ssl
+        )
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
