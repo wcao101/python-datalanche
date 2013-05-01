@@ -237,26 +237,27 @@ def read(client, test):
         print repr(e)
     return success
 
-if len(sys.argv) < 3 or len(sys.argv) > 6:
-    print 'ERROR: invalid format: python test.py <apikey> <testdir> [ <host> <port> <verify_ssl> ]'
+if len(sys.argv) < 4 or len(sys.argv) > 7:
+    print 'ERROR: invalid format: python test.py <apikey> <apisecret> <testdir> [ <host> <port> <verify_ssl> ]'
     sys.exit(1)
 
 num_passed = 0
 total_tests = 0
 valid_key = sys.argv[1]
-dirname = sys.argv[2]
+valid_secret = sys.argv[2]
+dirname = sys.argv[3]
 
 host = None
-if len(sys.argv) >= 4:
-    host = sys.argv[3]
+if len(sys.argv) >= 5:
+    host = sys.argv[4]
 
 port = None
-if len(sys.argv) >= 5:
-    port = sys.argv[4]
+if len(sys.argv) >= 6:
+    port = sys.argv[5]
 
 verify_ssl = True
-if len(sys.argv) >= 6:
-    verify_ssl = sys.argv[5].lower()
+if len(sys.argv) >= 7:
+    verify_ssl = sys.argv[6].lower()
     if verify_ssl == '0' or verify_ssl == 'false':
         verify_ssl = False
     else:
@@ -282,6 +283,8 @@ for filename in sorted(files):
 
             if test['parameters']['key'] == 'valid_key':
                 test['parameters']['key'] = valid_key;
+            if test['parameters']['secret'] == 'valid_secret':
+                test['parameters']['secret'] = valid_secret;
 
             success = False
 
