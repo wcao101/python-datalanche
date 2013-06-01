@@ -2,6 +2,8 @@
 
 from datalanche import *
 import collections
+import decimal
+import csv
 import json
 import os
 import sys
@@ -137,6 +139,37 @@ def convert_sort(value):
     
     return newstr
 
+def get_records_from_file(filename):
+    records = list()
+
+    infile = open(filename, 'rb')
+    reader = csv.reader(infile, delimiter=',', quotechar='\"', escapechar='\\')
+
+    for i, row in enumerate(reader):
+        if i != 0:
+            records.append({
+                'record_id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'address': row[3],
+                'city': row[4],
+                'state': row[5],
+                'zip_code': row[6],
+                'phone_number': row[7],
+                'date_field': row[8],
+                'time_field': row[9],
+                'timestamp_field': row[10],
+                'boolean_field': row[11],
+                'int16_field': row[12],
+                'int32_field': row[13],
+                'int64_field': row[14],
+                'float_field': row[15],
+                'double_field': row[16],
+                'decimal_field': row[17]
+            })
+
+    return records
+
 def handle_test(data, test):
     result = 'FAIL'
 
@@ -181,12 +214,93 @@ def handle_exception(e, test):
         return True
     return False
 
-def get_list(client, test):
+def add_columns(client, test):
     success = False
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        data = client.get_list()
+        client.add_columns(test['parameters']['dataset'], test['body']['columns'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def create_dataset(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.create_dataset(test['body'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def delete_dataset(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.delete_dataset(test['parameters']['dataset'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def delete_records(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.delete_records(test['parameters']['dataset'], convert_filter(test['parameters']['filter']))
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def get_dataset_list(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        data = client.get_dataset_list()
+
+        # getDatasetList() test is a bit different than the rest
+        # because a server can have any number of datasets. We test
+        # that the expected dataset(s) is listed rather than
+        # checking the entire result is valid, but only if a valid
+        # response is expected.
+
+        datasets = list()
+        
+        for i in range(0, data['num_datasets']):
+            dataset = data['datasets'][i]
+
+            # too variable to test
+            try:
+                del dataset['last_updated']
+                del dataset['when_created']
+            except Exception as e:
+                print repr(e)
+                # ignore error
+
+            for j in range(0, test['expected']['data']['num_datasets']):
+                if dataset == test['expected']['data']['datasets'][j]:
+                    datasets.append(dataset)
+                    break
+
+        data = collections.OrderedDict()
+        data['num_datasets'] = len(datasets)
+        data['datasets'] = datasets
+
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -200,6 +314,13 @@ def get_schema(client, test):
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
         data = client.get_schema(test['parameters']['dataset'])
+
+        # Delete date/time properties since they are probably
+        # different than the test data. This is okay because
+        # the server sets these values on write operations.
+        del data['when_created']
+        del data['last_updated']
+
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -207,17 +328,32 @@ def get_schema(client, test):
         print repr(e)
     return success
 
-def read(client, test):
+def insert_records(client, test, filename):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        if test['body'] == 'dataset_file':
+            records = get_records_from_file(filename)
+            client.insert_records(test['parameters']['dataset'], records)
+        else:
+            client.insert_records(test['parameters']['dataset'], test['body']['records'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def read_records(client, test):
     success = False
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
 
         params = DLReadParams()
-        if 'dataset' in test['parameters']:
-            params.dataset = test['parameters']['dataset']
-        if 'fields' in test['parameters']:
-            params.fields = test['parameters']['fields']
+        if 'columns' in test['parameters']:
+            params.columns = test['parameters']['columns']
         if 'filter' in test['parameters']:
             params.filter = convert_filter(test['parameters']['filter'])
         if 'limit' in test['parameters']:
@@ -229,7 +365,7 @@ def read(client, test):
         if 'total' in test['parameters']:
             params.total = test['parameters']['total']
 
-        data = client.read(params)
+        data = client.read_records(test['parameters']['dataset'], params)
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -237,15 +373,67 @@ def read(client, test):
         print repr(e)
     return success
 
+def remove_columns(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.remove_columns(test['parameters']['dataset'], test['parameters']['columns'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def set_details(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.set_details(test['parameters']['dataset'], test['body'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def update_columns(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.update_columns(test['parameters']['dataset'], test['body'])
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
+def update_records(client, test):
+    success = False
+    try:
+        client.auth_key = test['parameters']['key']
+        client.auth_secret = test['parameters']['secret']
+        client.update_records(test['parameters']['dataset'], test['body'], convert_filter(test['parameters']['filter']))
+        success = handle_test(None, test)
+    except DLException as e:
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+    return success
+
 if len(sys.argv) < 4 or len(sys.argv) > 7:
-    print 'ERROR: invalid format: python test.py <apikey> <apisecret> <testdir> [ <host> <port> <verify_ssl> ]'
+    print 'ERROR: invalid format: python test.py <apikey> <apisecret> <testfile> [ <host> <port> <verify_ssl> ]'
     sys.exit(1)
 
 num_passed = 0
 total_tests = 0
 valid_key = sys.argv[1]
 valid_secret = sys.argv[2]
-dirname = sys.argv[3]
+test_file = sys.argv[3]
 
 host = None
 if len(sys.argv) >= 5:
@@ -263,42 +451,75 @@ if len(sys.argv) >= 7:
     else:
         verify_ssl = True
 
-client = DLClient(host = host, port = port, verify_ssl = verify_ssl)
+client = DLClient(key = valid_key, secret = valid_secret, host = host, port = port, verify_ssl = verify_ssl)
 
-files = os.listdir(dirname)
-for filename in sorted(files):
-    if filename.endswith('.json') == True:
+try:
+    client.delete_dataset('test_dataset')
+except Exception as e:
+    print repr(e)
+    # ignore error
 
-        jsondata = json.load(open(dirname + '/' + filename), object_pairs_hook=collections.OrderedDict)
-        num_tests = len(jsondata['tests'])
-        total_tests = total_tests + num_tests
+try:
+    client.delete_dataset('new_test_dataset')
+except Exception as e:
+    print repr(e)
+    # ignore error
 
-        for i in range(0, num_tests):
-            test = jsondata['tests'][i]
+test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
+root_dir = os.path.dirname(test_file)
+dataset_file = root_dir + '/' + test_suites['dataset_file']
+files = test_suites['suites']['tests']
 
-            # skip test if python listed
-            if 'skip_languages' in test and 'python' in test['skip_languages']:
-                total_tests = total_tests - 1
-                continue
+for filename in files:
 
-            if test['parameters']['key'] == 'valid_key':
-                test['parameters']['key'] = valid_key;
-            if test['parameters']['secret'] == 'valid_secret':
-                test['parameters']['secret'] = valid_secret;
+    jsondata = json.load(open(root_dir + '/' + filename), object_pairs_hook=collections.OrderedDict)
+    num_tests = len(jsondata['tests'])
+    total_tests = total_tests + num_tests
 
-            success = False
+    for i in range(0, num_tests):
+        test = jsondata['tests'][i] 
 
-            if test['method'] == 'list':
-                success = get_list(client, test)
-            elif test['method'] == 'schema':
-                success = get_schema(client, test)
-            elif test['method'] == 'read':
-                success = read(client, test)
-            else:
-                print 'ERROR: ' + test['method'] + ' method not found'
+        # skip test if python listed
+        if 'skip_languages' in test and 'python' in test['skip_languages']:
+            total_tests = total_tests - 1
+            continue
 
-            if success == True:
-                num_passed = num_passed + 1
+        if test['parameters']['key'] == 'valid_key':
+            test['parameters']['key'] = valid_key;
+        if test['parameters']['secret'] == 'valid_secret':
+            test['parameters']['secret'] = valid_secret;
+
+        success = False
+
+        if test['method'] == 'add_columns':
+            success = add_columns(client, test)
+        elif test['method'] == 'create_dataset':
+            success = create_dataset(client, test)
+        elif test['method'] == 'delete_dataset':
+            success = delete_dataset(client, test)
+        elif test['method'] == 'delete_records':
+            success = delete_records(client, test)
+        elif test['method'] == 'insert_records':
+            success = insert_records(client, test, dataset_file)
+        elif test['method'] == 'get_dataset_list':
+            success = get_dataset_list(client, test)
+        elif test['method'] == 'get_schema':
+            success = get_schema(client, test)
+        elif test['method'] == 'read_records':
+            success = read_records(client, test)
+        elif test['method'] == 'remove_columns':
+            success = remove_columns(client, test)
+        elif test['method'] == 'set_details':
+            success = set_details(client, test)
+        elif test['method'] == 'update_columns':
+            success = update_columns(client, test)
+        elif test['method'] == 'update_records':
+            success = update_records(client, test)
+        else:
+            print 'ERROR: ' + test['method'] + ' method not found'
+
+        if success == True:
+            num_passed = num_passed + 1
 
 print '-------------------------------'
 print 'passed: ' + str(num_passed)
