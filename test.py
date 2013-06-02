@@ -287,6 +287,10 @@ def get_dataset_list(client, test):
             # too variable to test
             try:
                 del dataset['last_updated']
+            except Exception as e:
+                # ignore error
+                print repr(e)
+            try:
                 del dataset['when_created']
             except Exception as e:
                 # ignore error
@@ -468,7 +472,7 @@ except Exception as e:
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)
 dataset_file = root_dir + '/' + test_suites['dataset_file']
-files = test_suites['suites']['tests']
+files = test_suites['suites']['all']
 
 for filename in files:
 
