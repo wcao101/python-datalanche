@@ -240,8 +240,6 @@ class DLClient(object):
         if dataset_name != None:
             parameters['dataset'] = dataset_name
 
-        print json.dumps(details)
-
         r = self.client.post(
             url,
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
