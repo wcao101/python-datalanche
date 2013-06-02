@@ -7,7 +7,7 @@ from exception import DLException
 class DLFilter(object):
     def __init__(self):
         self._hasNot = False
-        self._field = None
+        self._column = None
         self._filters = None
         self._operator = None
         self._value = None
@@ -22,8 +22,8 @@ class DLFilter(object):
             if self._filters == None:
                 raise Exception('filter list = None in DLFilter')
 
-            if self._field != None:
-                raise Exception('field cannot be set when $and, $or used in DLFilter')
+            if self._column != None:
+                raise Exception('column cannot be set when $and, $or used in DLFilter')
 
             json_list = list()
             for i in range(0, len(self._filters)):
@@ -42,8 +42,8 @@ class DLFilter(object):
 
         else:
 
-            if self._field == None:
-                raise Exception('field = None in DLFilter')
+            if self._column == None:
+                raise Exception('column = None in DLFilter')
             if self._operator == None:
                 raise Exception('operator = None in DLFilter')
             if self._value == None:
@@ -56,12 +56,12 @@ class DLFilter(object):
                 op_expr = { '$not': op_expr }
 
             json = collections.OrderedDict()
-            json[str(self._field)] = op_expr
+            json[str(self._column)] = op_expr
 
             return json
 
-    def field(self, string):
-        self._field = string
+    def column(self, string):
+        self._column = string
         return self
 
     def bool_and(self, filter_list):

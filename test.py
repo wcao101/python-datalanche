@@ -33,8 +33,8 @@ def convert_simple_filter(filter):
     has_not = False
 
     keys = filter.keys()
-    field = keys[0]
-    op_expr = filter[field]
+    column = keys[0]
+    op_expr = filter[column]
 
     keys = op_expr.keys()
     operator = keys[0]
@@ -50,49 +50,49 @@ def convert_simple_filter(filter):
 
     if operator == '$ends':
         if has_not == False:
-            new_filter.field(field).ends_with(value)
+            new_filter.column(column).ends_with(value)
         else:
-            new_filter.field(field).not_ends_with(value)
+            new_filter.column(column).not_ends_with(value)
     elif operator == '$contains':
         if has_not == False:
-            new_filter.field(field).contains(value)
+            new_filter.column(column).contains(value)
         else:
-            new_filter.field(field).not_contains(value)
+            new_filter.column(column).not_contains(value)
     elif operator == '$eq':
         if has_not == False:
-            new_filter.field(field).equals(value)
+            new_filter.column(column).equals(value)
         else:
-            new_filter.field(field).not_equals(value)
+            new_filter.column(column).not_equals(value)
     elif operator == '$gt':
         if has_not == False:
-            new_filter.field(field).greater_than(value)
+            new_filter.column(column).greater_than(value)
         else:
-            new_filter.field(field).less_than_equal(value)
+            new_filter.column(column).less_than_equal(value)
     elif operator == '$gte':
         if has_not == False:
-            new_filter.field(field).greater_than_equal(value)
+            new_filter.column(column).greater_than_equal(value)
         else:
-            new_filter.field(field).less_than(value)
+            new_filter.column(column).less_than(value)
     elif operator == '$in':
         if has_not == False:
-            new_filter.field(field).any_in(value)
+            new_filter.column(column).any_in(value)
         else:
-            new_filter.field(field).not_any_in(value)
+            new_filter.column(column).not_any_in(value)
     elif operator == '$lt':
         if has_not == False:
-            new_filter.field(field).less_than(value)
+            new_filter.column(column).less_than(value)
         else:
-            new_filter.field(field).greater_than_equal(value)
+            new_filter.column(column).greater_than_equal(value)
     elif operator == '$lte':
         if has_not == False:
-            new_filter.field(field).less_than_equal(value)
+            new_filter.column(column).less_than_equal(value)
         else:
-            new_filter.field(field).greater_than(value)
+            new_filter.column(column).greater_than(value)
     elif operator == '$starts':
         if has_not == False:
-            new_filter.field(field).starts_with(value)
+            new_filter.column(column).starts_with(value)
         else:
-            new_filter.field(field).not_starts_with(value)
+            new_filter.column(column).not_starts_with(value)
 
     return new_filter
 
@@ -289,8 +289,8 @@ def get_dataset_list(client, test):
                 del dataset['last_updated']
                 del dataset['when_created']
             except Exception as e:
-                print repr(e)
                 # ignore error
+                print repr(e)
 
             for j in range(0, test['expected']['data']['num_datasets']):
                 if dataset == test['expected']['data']['datasets'][j]:
