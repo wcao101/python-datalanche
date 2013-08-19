@@ -7,45 +7,48 @@ import collections
 from exception import DLException
 from requests.auth import HTTPBasicAuth
 
+
 class Query(object):
     def __init__(self):
         self.url_type = 'get'
         self.base_url = '/'
-        self.add_columns = None
-        self.alter_columns = None
-        self.columns = None
-        self.debug = None
-        self.description = None
-        self.drop_columns = None
-        self.from_table = None
-        self.group_by = None
-        self.is_private = None
-        self.license = None
-        self.limit = None
-        self.offset = None
-        self.order_by = None
-        self.name = None
-        self.rename = None
-        self.select = None
-        self.set = None
-        self.sorce = None
-        self.total = None
-        self.values = None
-        self.where = None
+        self.params = {
+            'add_columns' : None,
+            'alter_columns' : None,
+            'columns' : None,
+            'debug' : None,
+            'description' : None,
+            'drop_columns' : None,
+            'from_table' : None,
+            'group_by' : None,
+            'is_private' : None,
+            'license' : None,
+            'limit' : None,
+            'offset' : None,
+            'order_by' : None,
+            'name' : None,
+            'rename' : None,
+            'select' : None,
+            'set' : None,
+            'sorce' : None,
+            'total' : None,
+            'values' : None,
+            'where' : None,
+        }
 
     def add_columns(self,columns):
         
-        if add_columns == None:
-            self.add_columns = []
-            self.add_columns.append(columns)
+        if self.params['add_columns'] == None:
+            self.params['add_columns'] = []
+            self.params['add_columns'].append(columns)
 
         return self
     
     def alter_columnsf(self,column_name, column_object):
         
-        if self.alter_columns == None:
-            self.alter_columns ={}
-        alter_columns['column_name'] = column_object
+        if self.params['alter_columns'] == None:
+            self.params['alter_columns'] ={}
+        self.params['alter_columns']['column_name'] = column_object
 
         return self
 
@@ -53,13 +56,13 @@ class Query(object):
         
         self.urlType = 'post'
         self.base_url = '/delete_from'
-        self.name = table_name
+        self.params['name'] = table_name
         
         return self
         
     def columns(object_array):
         
-        self.columns = object_array
+        self.params['columns'] = object_array
         
         return self
 
@@ -67,13 +70,13 @@ class Query(object):
         
         self.url_type = 'post'
         self.base_url = '/create_table'
-        self.name = table_name
+        self.params['name'] = table_name
         
         return self
 
     def debug(bool):
         
-        self.debug = bool
+        self.params['debug'] = bool
 
         return self
 
@@ -81,28 +84,28 @@ class Query(object):
 
         self.url_type = 'post'
         self.base_url = '/delete_from'
-        self.name = table_name
+        self.params['name'] = table_name
 
         return self
 
     def description(text):
         
-        self.description = text
+        self.params['description'] = text
         
         return self
 
     def distinct(bool):
         
-        self.distinct = bool
+        self.params['distinct'] = bool
 
         return self
 
     def drop_column(column_name):
 
-        if(self.drop_column == None):
-            self.drop_column = []
+        if(self.params['drop_column'] == None):
+            self.params['drop_column'] = []
         
-        self.drop_column.append(column_name)
+        self.params['drop_column'].append(column_name)
 
         return self
 
@@ -110,13 +113,13 @@ class Query(object):
 
         self.url_type = 'del'
         self.base_url = '/drop_table'
-        self.name = table_name
+        self.params['name'] = table_name
 
         return self
 
     def from_table(tables):
         
-        self.from_table = tables
+        self.params['from_table'] = tables
 
         return self
 
@@ -124,7 +127,7 @@ class Query(object):
 
         self.url_type = 'get'
         self.base_url = '/get_table_info'
-        self.name = table_name
+        self.params['name'] = table_name
 
         return self
 
@@ -137,7 +140,7 @@ class Query(object):
 
     def group_by(columns):
 
-        self.group_by = columns
+        self.params['group_by'] = columns
 
         return self
 
@@ -150,37 +153,37 @@ class Query(object):
 
     def is_private(bool):
         
-        self.is_private = bool
+        self.params['is_private'] = bool
 
         return self
 
     def license(license_object):
         
-        self.license = license_object
+        self.params['license'] = license_object
 
         return self
 
     def limit(integer):
         
-        self.limit = integer
+        self.params['limit'] = integer
 
         return self
 
     def offset(integer):
 
-        self.offset = integer
+        self.params['offset'] = integer
 
         return self
 
     def order_by(object_array):
         
-        self.order_by = object_array
+        self.params['order_by'] = object_array
 
         return self
 
     def rename(table_name):
 
-        self.rename = table_name
+        self.params['rename'] = table_name
 
         return self
 
@@ -188,45 +191,45 @@ class Query(object):
 
         self.url_type = 'post'
         self.base_url = '/select_from'
-        self.select = columns
+        self.params['select'] = columns
 
         return self
 
     def set(form_map):
 
-        self.set = form_map
+        self.params['set'] = form_map
 
         return self
 
     def sources(object_array):
         
-        self.sources = object_array
+        self.params['sources'] = object_array
 
         return self
 
     def total(bool):
         
-        self.total = bool
+        self.params['total'] = bool
 
-        return total
+        return self
 
     def update(table_name):
 
         self.url_type = 'post'
         self.base_url = '/update'
-        self.name = table_name
+        self.params['name'] = table_name
 
         return self
 
     def values(rows):
 
-        self.values = rows
+        self.params['values'] = rows
 
         return self
 
     def where(query_filter):
         
-        self.where = query_filter
+        self.params['where'] = query_filter
 
         return self
         

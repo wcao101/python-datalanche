@@ -4,48 +4,16 @@ import decimal
 import json
 import requests
 import collections
+import urllib
 from exception import DLException
 from requests.auth import HTTPBasicAuth
 
-def is_boolean(s):
-    if s == True or s == False:
-        return True
-    return False
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-    except TypeError:
-        return False
-
-def is_string(s):
-    return isinstance(s, basestring)
-
-# handle cases where value may not be a list of strings
-def list2str(value):
-    newstr = ''
-
-    if is_boolean(value):
-        newstr = str(value).lower()
-    elif is_number(value) or is_string(value):
-        newstr = str(value)
-    else:
-        for i in range(0, len(value)):
-            if is_boolean(value[i]):
-                newstr = newstr + str(value[i]).lower()
-            else:
-                newstr = newstr + str(value[i])
-
-            if i < len(value) - 1:
-                newstr = newstr + ','
-    
-    return newstr
-
-class Client(object):
-    def __init__(self, key = '', secret = '', host = None, port = None, verify_ssl = True):
+class DLClient(object):
+    def __init__(
+        self, key = '', secret = '', 
+        host = None, port = None, verify_ssl = True
+    ):
         self.auth_key = key
         self.auth_secret = secret
         self.client = requests.Session()
@@ -56,237 +24,181 @@ class Client(object):
         if port != None:
             self.url = self.url + ':' + str(port)
 
-    def add_columns(self, dataset_name, columns):
-        url = self.url + '/add_columns'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-
-        body = {
-            'num_columns': len(columns),
-            'columns': columns
-        }
-
-        r = self.client.post(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            params = parameters,
-            data = json.dumps(body),
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-
-    def create_dataset(self, schema):
-        url = self.url + '/create_dataset'
-
-        r = self.client.post(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            data = json.dumps(schema),
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-
-    def delete_dataset(self, dataset_name):
-        url = self.url + '/delete_dataset'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-
-        r = self.client.delete(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            params = parameters,
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-
-    def delete_records(self, dataset_name, query_filter = None):
-        url = self.url + '/delete_records'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-        if query_filter != None:
-            parameters['filter'] = str(query_filter)
-
-        r = self.client.delete(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            params = parameters,
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-
-    def get_dataset_list(self):
-        url = self.url + '/get_dataset_list'
-
-        r = self.client.get(
-            url,
+    def query(self,q = None):
+        
+        if (q == None):
+           pirnt"Error: query is None."
+           return self
+           
+        if (q.params['url_type'] == 'del'):
+            self.client.delete(
+            get_url(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
             verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-        return r.json(object_pairs_hook=collections.OrderedDict)
+            )
 
-    def get_schema(self, dataset_name):
-        url = self.url + '/get_schema'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-
-        r = self.client.get(
-            url,
+        elif (q.params['url_type'] = 'post'):
+            self.client.post(
+            get_url(q),
+            get_body(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            params = parameters,
             verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-        return r.json(object_pairs_hook=collections.OrderedDict)
-
-    def insert_records(self, dataset_name, records):
-        url = self.url + '/insert_records'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-
-        body = {
-            'num_records': len(records),
-            'records': records
-        }
-
-        r = self.client.post(
-            url,
+            )
+            
+        elif (q.params['url_type'] = 'get'):
+            self.client.get(
+            get_url(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            params = parameters,
-            data = json.dumps(body),
             verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
+            )
+
+        else:
             raise DLException(r.status_code, r.json(), r.url)
 
-    def read_records(self, dataset_name, params = None):
-        url = self.url + '/read_records'
+def get_body(query = None):
 
-        parameters = {}
+    body = {}
+    
+    if(query == None):
+        return body
 
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-        if params and params.columns != None:
-            parameters['columns'] = list2str(params.columns)
-        if params and params.filter != None:
-            parameters['filter'] = str(params.filter)
-        if params and params.limit != None:
-            parameters['limit'] = params.limit
-        if params and params.skip != None:
-            parameters['skip'] = params.skip
-        if params and params.sort != None:
-            parameters['sort'] = list2str(params.sort)
-        if params and params.total != None:
-            parameters['total'] = str(params.total).lower()
+    if(query.params['debug'] != None):
+        body['debug'] = query.params['debug']
+        
+    if(query.base_url == '/alter_table'):
+        
+        if(query.params['add_columns'] != None):
+            body['add_columns'] = query.params['add_columns']
+            
+        if(query.params['alter_columns'] != None):
+            body['alter_columns'] = query.params['alter_columns']
 
-        r = self.client.get(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            params = parameters,
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-        return r.json(object_pairs_hook=collections.OrderedDict)
+        if(query.params['name'] != None):
+            body['name'] = query.params['name']
+            
+        if(query.params['description'] != None):
+            body['description'] = query.params['description']
 
-    def remove_columns(self, dataset_name, columns):
-        url = self.url + '/remove_columns'
+        if(query.params['drop_columns'] != None):
+            body['drop_columns'] = query.params['drop_columns']
 
-        parameters = {}
+        if(query.params['is_private'] != None):
+            body['is_private'] = query.params['is_private']
 
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-        if columns != None:
-            parameters['columns'] = list2str(columns)
+        if(query.params['license'] != None):
+            body['license'] = query.params['license']
 
-        r = self.client.delete(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            params = parameters,
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+        if(query.params['rename'] != None):
+            body['rename'] = query.params['rename']
 
-    def set_details(self, dataset_name, details):
-        url = self.url + '/set_details'
+        if(query.params['sources'] != None):
+            body['sources'] = query.params['sources']
+        
+    elif(query.base_url == '/create_table'):
+        
+         if (query.params['columns'] != None):
+            body['columns'] = query.params['columns']
+        
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
+        
+        if (query.params['description'] != None):
+            body['description'] = query.params['description']
+                
+        if (query.params['is_private'] != None) 
+            body['is_private'] = query.params['is_private']
+        
+        if (query.params['license'] != None) 
+            body['license'] = query.params['license']
+        
+        if (query.params['sources'] != None):
+            body['sources'] = query.params['sources']
+            
+    else if (query.base_url == '/delete_from':
 
-        parameters = {}
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
+        
+        if (query.params['where'] != None): 
+            body['where'] = query.params['where']
+        
+    else if (query.base_url == '/insert_into'):
 
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
+        
+        if (query.params['values'] != None):
+            body['values'] = query.params['values']
+        
+    else if (query.base_url == '/select_from'):
 
-        r = self.client.post(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            params = parameters,
-            data = json.dumps(details),
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+        if (query.params['distinct'] != None):
+            body['distinct'] = query.params['distinct']
+        
+        if (query.params['from_table'] != None):
+            body['from'] = query.params['from_table']
+        
+        if (query.params['groupBy'] != None):
+            body['group_by'] = query.params['groupBy']
+        
+        if (query.params['limit'] != None):
+            body['limit'] = query.params['limit']
+        
+        if (query.params['offset'] != None):
+            body['offset'] = query.params['offset']
+        
+        if (query.params['orderBy'] != None):
+            body['order_by'] = query.params['orderBy']
+        
+        if (query.params['select'] != None):
+            body['select'] = query.params['select']
+        
+        if (query.params['total'] != None):
+            body['total'] = query.params['total']
+        
+        if (query.params['where'] != None):
+            body['where'] = query.params['where']
+        
+    else if (query.base_url == '/update'):
 
-    def update_columns(self, dataset_name, columns):
-        url = self.url + '/update_columns'
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
+        
+        if (query.params['set'] != None):
+            body['set'] = query.params['set']
+        
+        if (query.where != None):
+            body['where'] = query.params['where']
+        
+    return self
+# For POST, all parameters are in the body so that they are also encrypted.
+# For example, the WHERE clause may have unique identifiers, plain-text
+# passwords, and other potentially sensitive information.
+def getUrl(query):
 
-        parameters = {}
+    if (query == None):
+        return '/'
+    
+    url = query.base_url
+    parameters = {}
 
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
+    if (query.params['debug'] != None):
+        parameters['debug'] = query.params['debug']
+    
+    if (url == '/drop_table'):
+        if (query.parmas['name'] != None):
+            parameters['name'] = query.params['name']
+        
+    elif (url == '/get_table_info'):
+        if (query.params['name'] != None):
+            parameters['name'] = query.params['name']
+        
+    else if (url == '/get_table_list'):
+        # do nothing
 
-        r = self.client.post(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            params = parameters,
-            data = json.dumps(columns),
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
-
-    def update_records(self, dataset_name, records, query_filter = None):
-        url = self.url + '/update_records'
-
-        parameters = {}
-
-        if dataset_name != None:
-            parameters['dataset'] = dataset_name
-        if query_filter != None:
-            parameters['filter'] = str(query_filter)
-
-        r = self.client.post(
-            url,
-            auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = {'Content-type': 'application/json'},
-            params = parameters,
-            data = json.dumps(records),
-            verify = self.verify_ssl
-        )
-        if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+    # URL encode parameters
+    query_str = urllib.urlencode(parameters)
+    if (not query_str):
+        url += '?' + query_str
+    
+    return url
