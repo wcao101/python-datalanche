@@ -31,26 +31,34 @@ class DLClient(object):
            return self
            
         if (q.params['url_type'] == 'del'):
-            self.client.delete(
+           r = self.client.delete(
             get_url(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
             verify = self.verify_ssl
             )
+           if not 200 <= r.status_code < 300:
+               raise DLException(r.status_code, r.json(), r.url)
+
 
         elif (q.params['url_type'] = 'post'):
-            self.client.post(
+            r = self.client.post(
             get_url(q),
-            get_body(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+            headers ={'Content-type':'application/json'}
+            data = json.dumps(get_body(q)),
             verify = self.verify_ssl
             )
+            if not 200 <= r.status_code < 300:
+                raise DLException(r.status_code, r.json(), r.url)
             
         elif (q.params['url_type'] = 'get'):
-            self.client.get(
+            r = self.client.get(
             get_url(q),
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
             verify = self.verify_ssl
             )
+            if not 200 <= r.status_code < 300:
+                raise DLException(r.status_code, r.json(), r.url)
 
         else:
             raise DLException(r.status_code, r.json(), r.url)
@@ -114,7 +122,7 @@ def get_body(query = None):
         if (query.params['sources'] != None):
             body['sources'] = query.params['sources']
             
-    else if (query.base_url == '/delete_from':
+    elif (query.base_url == '/delete_from':
 
         if (query.params['name'] != None):
             body['name'] = query.params['name']
@@ -122,7 +130,7 @@ def get_body(query = None):
         if (query.params['where'] != None): 
             body['where'] = query.params['where']
         
-    else if (query.base_url == '/insert_into'):
+    elif (query.base_url == '/insert_into'):
 
         if (query.params['name'] != None):
             body['name'] = query.params['name']
@@ -130,7 +138,7 @@ def get_body(query = None):
         if (query.params['values'] != None):
             body['values'] = query.params['values']
         
-    else if (query.base_url == '/select_from'):
+    elif (query.base_url == '/select_from'):
 
         if (query.params['distinct'] != None):
             body['distinct'] = query.params['distinct']
@@ -159,7 +167,7 @@ def get_body(query = None):
         if (query.params['where'] != None):
             body['where'] = query.params['where']
         
-    else if (query.base_url == '/update'):
+    elif (query.base_url == '/update'):
 
         if (query.params['name'] != None):
             body['name'] = query.params['name']
