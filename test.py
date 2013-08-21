@@ -8,136 +8,35 @@ import json
 import os
 import sys
 
-def is_boolean(s):
-    if s == True or s == False:
-        return True
-    return False
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-    except TypeError:
-        return False
+if len(sys.argv) < 4 or len(sys.argv) > 7:
+    print 'ERROR: invalid format: python test.py <apikey> <apisecret> <testfile> [ <host> <port> <verify_ssl> ]'
+    sys.exit(1)
 
-def is_string(s):
-    return isinstance(s, basestring)
+num_passed = 0
+total_tests = 0
+valid_key = sys.argv[1]
+valid_secret = sys.argv[2]
+test_file = sys.argv[3]
 
-def convert_simple_filter(filter):
+host = None
+if len(sys.argv) >= 5:
+    host = sys.argv[4]
 
-    if isinstance(filter, dict) == False:
-        return filter
+port = None
+if len(sys.argv) >= 6:
+    port = sys.argv[5]
 
-    has_not = False
-
-    keys = filter.keys()
-    column = keys[0]
-    op_expr = filter[column]
-
-    keys = op_expr.keys()
-    operator = keys[0]
-    value = op_expr[operator]
-
-    if operator == '$not':
-        has_not = True
-        keys = value.keys()
-        operator = keys[0]
-        value = value[operator]
-
-    new_filter = DLFilter()
-
-    if operator == '$ends':
-        if has_not == False:
-            new_filter.column(column).ends_with(value)
-        else:
-            new_filter.column(column).not_ends_with(value)
-    elif operator == '$contains':
-        if has_not == False:
-            new_filter.column(column).contains(value)
-        else:
-            new_filter.column(column).not_contains(value)
-    elif operator == '$eq':
-        if has_not == False:
-            new_filter.column(column).equals(value)
-        else:
-            new_filter.column(column).not_equals(value)
-    elif operator == '$gt':
-        if has_not == False:
-            new_filter.column(column).greater_than(value)
-        else:
-            new_filter.column(column).less_than_equal(value)
-    elif operator == '$gte':
-        if has_not == False:
-            new_filter.column(column).greater_than_equal(value)
-        else:
-            new_filter.column(column).less_than(value)
-    elif operator == '$in':
-        if has_not == False:
-            new_filter.column(column).any_in(value)
-        else:
-            new_filter.column(column).not_any_in(value)
-    elif operator == '$lt':
-        if has_not == False:
-            new_filter.column(column).less_than(value)
-        else:
-            new_filter.column(column).greater_than_equal(value)
-    elif operator == '$lte':
-        if has_not == False:
-            new_filter.column(column).less_than_equal(value)
-        else:
-            new_filter.column(column).greater_than(value)
-    elif operator == '$starts':
-        if has_not == False:
-            new_filter.column(column).starts_with(value)
-        else:
-            new_filter.column(column).not_starts_with(value)
-
-    return new_filter
-
-def convert_filter(filter):
-
-    if isinstance(filter, dict) == False:
-        return filter
-
-    keys = filter.keys()
-    operator = keys[0]
-
-    if operator == '$and' or operator == '$or':
-        filter_list = filter[operator]
-
-        new_filter_list = list()
-        for f in filter_list:
-            new_filter_list.append(convert_filter(f))
-
-        if operator == '$and':
-            return DLFilter().bool_and(new_filter_list)
-        else:
-            return DLFilter().bool_or(new_filter_list)
+verify_ssl = True
+if len(sys.argv) >= 7:
+    verify_ssl = sys.argv[6].lower()
+    if verify_ssl == '0' or verify_ssl == 'false':
+        verify_ssl = False
     else:
-        return convert_simple_filter(filter)
+        verify_ssl = True
 
-def convert_sort(value):
-    newstr = ''
+client = DLClient(key = valid_key, secret = valid_secret, host = host, port = port, verify_ssl = verify_ssl)
 
-    if is_boolean(value):
-        newstr = str(value).lower()
-    elif is_number(value) or is_string(value):
-        newstr = str(value)
-    else:
-        for i in range(0, len(value)):
-            if is_boolean(value[i]):
-                newstr = newstr + str(value[i]).lower()
-            elif is_number(value[i]) or is_string(value[i]):
-                newstr = newstr + str(value[i])
-            else:
-                newstr = newstr + str(value[i])
-
-            if i < len(value) - 1:
-                newstr = newstr + ','
-    
-    return newstr
 
 def get_records_from_file(filename):
     records = list()
@@ -214,12 +113,49 @@ def handle_exception(e, test):
         return True
     return False
 
-def add_columns(client, test):
+def alter_table(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        client.add_columns(test['parameters']['dataset'], test['body']['columns'])
+        
+        for key, value in test['parameters'].items():
+            if (key == 'name'):
+                q.alter_table(value)
+            elif(key == 'rename'):
+                q.rename(value)
+            elif(key == 'description'):
+                q.description(value)
+            elif(key == 'is_private'):
+                q.is_private(value)
+            elif(key == 'license'):
+                q.license(value)
+            elif(key == 'sources'):
+                q.sources(value)
+            elif(key == 'add_columns'):
+                if(isinstance(test['parameters']['add_columns'],list)):
+                    for i in test['parameters']['add_columns']:
+                        q.add_column(i)
+                else:
+                    q.params['add_columns'] = test['parameters']['add_columns']
+            elif(key == 'drop_columns'):
+                if(isinstance(test['parameters']['drop_columns'],list)):
+                    for i in test['parameters']['drop_columns']:
+                        q.drop_column(i)
+                else:
+                    q.params['drop_columns'] = test['parameters']['drop_columns']
+            elif(key == 'alter_columns'):
+                if(isinstance(test['parameters']['alter_columns'],dict) and 
+                   len(test['parameters']['alter_columns'].keys()) > 0):
+
+                    for key, value in test['parameters']['alter_columns'].items():
+                        q.alter_column(key, value)
+                else:
+                    q.params['alter_columns'] = test['parameters']['alter_columns']
+
+
+        client.query(q)
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -227,12 +163,28 @@ def add_columns(client, test):
         print repr(e)
     return success
 
-def create_dataset(client, test):
+def create_table(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        client.create_dataset(test['body'])
+        
+        for key,value in test['parameters'].items():
+            if(key == 'name'):
+                q.create_table(value)
+            elif(key == 'description'):
+                q.description(value)
+            elif(key == 'is_private'):
+                q.is_private(value)
+            elif(key == 'license'):
+                q.license(value)
+            elif(key == 'sources'):
+                q.sources(value)
+            elif(key == 'columns'):
+                q.columns(value)
+        
+        client.query(q)
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -240,12 +192,15 @@ def create_dataset(client, test):
         print repr(e)
     return success
 
-def delete_dataset(client, test):
+def drop_table(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        client.delete_dataset(test['parameters']['dataset'])
+        q.drop_table(test['parameters']['name'])
+        
+        client.query(q)
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -253,12 +208,20 @@ def delete_dataset(client, test):
         print repr(e)
     return success
 
-def delete_records(client, test):
+def delete_from(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        client.delete_records(test['parameters']['dataset'], convert_filter(test['parameters']['filter']))
+
+        for key,value in test['parameters'].items():
+            if (key == 'name'):
+                q.delete_from(value)
+            elif(key == 'where'):
+                q.where(value)
+
+        client.query(q)
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -266,12 +229,14 @@ def delete_records(client, test):
         print repr(e)
     return success
 
-def get_dataset_list(client, test):
+def get_table_list(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        data = client.get_dataset_list()
+        q.get_table_list()
+        data = client.query(q)
 
         # getDatasetList() test is a bit different than the rest
         # because a server can have any number of datasets. We test
@@ -279,31 +244,31 @@ def get_dataset_list(client, test):
         # checking the entire result is valid, but only if a valid
         # response is expected.
 
-        datasets = list()
+        tables= list()
         
-        for i in range(0, data['num_datasets']):
-            dataset = data['datasets'][i]
+        for i in range(0, data['num_tables']):
+            table = data['tables'][i]
 
             # too variable to test
             try:
-                del dataset['last_updated']
+                del table['last_updated']
             except Exception as e:
                 # ignore error
                 print repr(e)
             try:
-                del dataset['when_created']
+                del table['when_created']
             except Exception as e:
                 # ignore error
                 print repr(e)
 
-            for j in range(0, test['expected']['data']['num_datasets']):
-                if dataset == test['expected']['data']['datasets'][j]:
-                    datasets.append(dataset)
+            for j in range(0, test['expected']['data']['num_tables']):
+                if table == test['expected']['data']['tables'][j]:
+                    tables.append(table)
                     break
 
         data = collections.OrderedDict()
-        data['num_datasets'] = len(datasets)
-        data['datasets'] = datasets
+        data['num_tables'] = len(tables)
+        data['tables'] = tables
 
         success = handle_test(data, test)
     except DLException as e:
@@ -312,12 +277,14 @@ def get_dataset_list(client, test):
         print repr(e)
     return success
 
-def get_schema(client, test):
+def get_table_info(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        data = client.get_schema(test['parameters']['dataset'])
+        q.get_table_info(test['parameters']['name'])
+        data = client.query(q)
 
         # Delete date/time properties since they are probably
         # different than the test data. This is okay because
@@ -332,16 +299,22 @@ def get_schema(client, test):
         print repr(e)
     return success
 
-def insert_records(client, test, filename):
+def insert_into(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        if test['body'] == 'dataset_file':
+        q.insert_into(test['parameters']['name'])
+        
+        if test['parameters']['values'] == 'dataset_file':
             records = get_records_from_file(filename)
-            client.insert_records(test['parameters']['dataset'], records)
+            q.values(records)
+            client.quer(q)
         else:
-            client.insert_records(test['parameters']['dataset'], test['body']['records'])
+            q.values(test['parameters']['values'])
+            client.query(q)
+
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -349,27 +322,34 @@ def insert_records(client, test, filename):
         print repr(e)
     return success
 
-def read_records(client, test):
+def select_from(test):
+    
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        for key, value in test['parameters'].items():
+            if (key == 'select'):
+                q.select(value)
+            elif (key == 'distinct'):
+                q.distinct(value)
+            elif(key == 'from'):
+                q.from_table(value)
+            elif(key == 'where'):
+                q.where(value)
+            elif(key == 'group_by'):
+                q.group_by(value)
+            elif(key == 'order_by'):
+                q.order_by(value)
+            elif(key =='offset'):
+                q.offset(value)
+            elif(key == 'limit'):
+                q.limit(value)
+            elif(key == 'total'):
+                q.total(value)
 
-        params = DLReadParams()
-        if 'columns' in test['parameters']:
-            params.columns = test['parameters']['columns']
-        if 'filter' in test['parameters']:
-            params.filter = convert_filter(test['parameters']['filter'])
-        if 'limit' in test['parameters']:
-            params.limit = test['parameters']['limit']
-        if 'skip' in test['parameters']:
-            params.skip = test['parameters']['skip']
-        if 'sort' in test['parameters']:
-            params.sort = convert_sort(test['parameters']['sort'])
-        if 'total' in test['parameters']:
-            params.total = test['parameters']['total']
-
-        data = client.read_records(test['parameters']['dataset'], params)
+        data = client.query(q)
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -377,12 +357,23 @@ def read_records(client, test):
         print repr(e)
     return success
 
-def remove_columns(client, test):
+def update(test):
     success = False
+    q = DLQuery()
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        client.remove_columns(test['parameters']['dataset'], test['parameters']['columns'])
+
+        for key, value in test['parameters'].items():
+            if (key == 'name'):
+                q.update(value)
+            elif(key =='set'):
+                q.set(value)
+            elif(key=='where'):
+                q.where(value)
+
+        client.query(q)
+
         success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -390,81 +381,16 @@ def remove_columns(client, test):
         print repr(e)
     return success
 
-def set_details(client, test):
-    success = False
-    try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
-        client.set_details(test['parameters']['dataset'], test['body'])
-        success = handle_test(None, test)
-    except DLException as e:
-        success = handle_exception(e, test)
-    except Exception as e:
-        print repr(e)
-    return success
-
-def update_columns(client, test):
-    success = False
-    try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
-        client.update_columns(test['parameters']['dataset'], test['body'])
-        success = handle_test(None, test)
-    except DLException as e:
-        success = handle_exception(e, test)
-    except Exception as e:
-        print repr(e)
-    return success
-
-def update_records(client, test):
-    success = False
-    try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
-        client.update_records(test['parameters']['dataset'], test['body'], convert_filter(test['parameters']['filter']))
-        success = handle_test(None, test)
-    except DLException as e:
-        success = handle_exception(e, test)
-    except Exception as e:
-        print repr(e)
-    return success
-
-if len(sys.argv) < 4 or len(sys.argv) > 7:
-    print 'ERROR: invalid format: python test.py <apikey> <apisecret> <testfile> [ <host> <port> <verify_ssl> ]'
-    sys.exit(1)
-
-num_passed = 0
-total_tests = 0
-valid_key = sys.argv[1]
-valid_secret = sys.argv[2]
-test_file = sys.argv[3]
-
-host = None
-if len(sys.argv) >= 5:
-    host = sys.argv[4]
-
-port = None
-if len(sys.argv) >= 6:
-    port = sys.argv[5]
-
-verify_ssl = True
-if len(sys.argv) >= 7:
-    verify_ssl = sys.argv[6].lower()
-    if verify_ssl == '0' or verify_ssl == 'false':
-        verify_ssl = False
-    else:
-        verify_ssl = True
-
-client = DLClient(key = valid_key, secret = valid_secret, host = host, port = port, verify_ssl = verify_ssl)
+q = DLQuery()
 
 try:
-    client.delete_dataset('test_dataset')
+    client.query(q.drop_table('test_dataset'))
 except Exception as e:
     print repr(e)
     # ignore error
 
 try:
-    client.delete_dataset('new_test_dataset')
+    client.query(q.drop_table('new_test_dataset'))
 except Exception as e:
     print repr(e)
     # ignore error
@@ -492,35 +418,32 @@ for filename in files:
             test['parameters']['key'] = valid_key;
         if test['parameters']['secret'] == 'valid_secret':
             test['parameters']['secret'] = valid_secret;
+        #### for debug....####
+        #print test['parameters']['distinct']
 
         success = False
 
-        if test['method'] == 'add_columns':
-            success = add_columns(client, test)
-        elif test['method'] == 'create_dataset':
-            success = create_dataset(client, test)
-        elif test['method'] == 'delete_dataset':
-            success = delete_dataset(client, test)
-        elif test['method'] == 'delete_records':
-            success = delete_records(client, test)
-        elif test['method'] == 'insert_records':
-            success = insert_records(client, test, dataset_file)
-        elif test['method'] == 'get_dataset_list':
-            success = get_dataset_list(client, test)
-        elif test['method'] == 'get_schema':
-            success = get_schema(client, test)
-        elif test['method'] == 'read_records':
-            success = read_records(client, test)
-        elif test['method'] == 'remove_columns':
-            success = remove_columns(client, test)
-        elif test['method'] == 'set_details':
-            success = set_details(client, test)
-        elif test['method'] == 'update_columns':
-            success = update_columns(client, test)
-        elif test['method'] == 'update_records':
-            success = update_records(client, test)
-        else:
-            print 'ERROR: ' + test['method'] + ' method not found'
+        if test['method'] == 'alter_table':
+            success = alter_table(test)
+        elif test['method'] == 'create_table':
+            success = create_table(test)
+        elif test['method'] == 'delete_from':
+            success = delete_from(test)
+        elif test['method'] == 'drop_table':
+            success = drop_table(test)
+        elif test['method'] == 'get_table_info':
+            success = get_table_info(test)
+        elif test['method'] == 'get_table_list':
+            success = get_table_list(test)
+        elif test['method'] == 'insert_into':
+            success = insert_into(test)
+        elif test['method'] == 'select_from':
+            success = select_from(test)
+        elif test['method'] == 'update':
+            success = update(test)
+
+        # else:
+        #     print 'ERROR: ' + test['method'] + ' method not found'
 
         if success == True:
             num_passed = num_passed + 1
