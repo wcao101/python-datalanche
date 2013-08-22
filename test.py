@@ -74,7 +74,9 @@ def handle_test(data, test):
 
     if data == test['expected']['data']:
         result = 'PASS'
-
+    
+    print "\n"
+    print "testing handle_test()...", test['name']
     print json.dumps({
         'name': test['name'],
         'expected': test['expected'],
@@ -86,6 +88,7 @@ def handle_test(data, test):
         'result': result,
     })
 
+    print "\n"
     if result == 'PASS':
         return True
     return False
@@ -97,7 +100,9 @@ def handle_exception(e, test):
         and e.response['message'] == test['expected']['data']
         and e.response['code'] == test['expected']['exception']):
         result = 'PASS'
-
+    
+    print "\n"
+    print "Testing handle_exception()...", test['name']
     print json.dumps({
         'name': test['name'],
         'expected': test['expected'],
@@ -108,7 +113,8 @@ def handle_exception(e, test):
         },
         'result': result,
     })
-
+    print "\n"
+    
     if result == 'PASS':
         return True
     return False
@@ -169,6 +175,9 @@ def create_table(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+
+        if ('name' not in test['parameters'].keys()):
+            q.create_table(None)
         
         for key,value in test['parameters'].items():
             if(key == 'name'):
@@ -183,7 +192,9 @@ def create_table(test):
                 q.sources(value)
             elif(key == 'columns'):
                 q.columns(value)
-        
+            else:
+                q.unknown(value)
+                
         client.query(q)
         success = handle_test(None, test)
     except DLException as e:
@@ -198,6 +209,10 @@ def drop_table(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+
+        if ('name' not in test['parameters'].keys()):
+            q.drop_table(None)
+
         q.drop_table(test['parameters']['name'])
         
         client.query(q)
@@ -214,7 +229,10 @@ def delete_from(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-
+        
+        if ('name' not in test['parameters'].keys()):
+            q.delete_from(None)
+            
         for key,value in test['parameters'].items():
             if (key == 'name'):
                 q.delete_from(value)
@@ -283,6 +301,10 @@ def get_table_info(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        
+        if ('name' not in test['parameters'].keys()):
+            q.get_table_info(None)
+
         q.get_table_info(test['parameters']['name'])
         data = client.query(q)
 
@@ -305,6 +327,10 @@ def insert_into(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        
+        if ('name' not in test['parameters'].keys()):
+            q.insert_into(None)
+            
         q.insert_into(test['parameters']['name'])
         
         if test['parameters']['values'] == 'dataset_file':
@@ -329,6 +355,10 @@ def select_from(test):
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+
+        if ('from_table' not in test['parameters'].keys()):
+            q.from_table(None)
+        
         for key, value in test['parameters'].items():
             if (key == 'select'):
                 q.select(value)
@@ -386,15 +416,17 @@ q = DLQuery()
 try:
     client.query(q.drop_table('test_dataset'))
 except Exception as e:
-    print repr(e)
+    # print repr(e)
     # ignore error
 
-try:
-    client.query(q.drop_table('new_test_dataset'))
-except Exception as e:
-    print repr(e)
-    # ignore error
+    try:
+        client.query(q.drop_table('new_test_dataset'))
+    except Exception as e:
+        pass
+        # print repr(e)
+        # ignore error
 
+# after the new_test_dataset is loaded...
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)
 dataset_file = root_dir + '/' + test_suites['dataset_file']
@@ -442,8 +474,8 @@ for filename in files:
         elif test['method'] == 'update':
             success = update(test)
 
-        # else:
-        #     print 'ERROR: ' + test['method'] + ' method not found'
+        else:
+            print 'ERROR: ' + test['method'] + ' method not found'
 
         if success == True:
             num_passed = num_passed + 1

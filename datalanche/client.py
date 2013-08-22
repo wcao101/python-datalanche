@@ -24,7 +24,7 @@ def get_body(query = None):
         
         for i,value in query.params.items():
             ## print "testing...key is: ",i," value is: ",value
-            
+                       
             if(i == 'add_colunms' and value != None):
                 body['add_columns'] = value
             
@@ -61,6 +61,7 @@ def get_body(query = None):
                 body['columns'] = value
         
             if (i == 'name' and value != None):
+                print "Right now testing the client side: name is: ", value
                 body['name'] = value
         
             if (i == 'description' and value != None):
@@ -149,7 +150,13 @@ def get_body(query = None):
 # For POST, all parameters are in the body so that they are also encrypted.
 # For example, the WHERE clause may have unique identifiers, plain-text
 # passwords, and other potentially sensitive information.
-def get_url(query):
+def get_url(query = None):
+
+    if (query.base_url ==  '/create_table'):
+        if ('name' not in query.params.keys()):
+            print "the there is no name for creating the table"
+            return None
+        pass
 
     if (query == None):
         return '/'
@@ -157,6 +164,7 @@ def get_url(query):
     url = query.base_url
     parameters = OrderedDict()
 
+    
     if (query.params['debug'] != None):
         parameters['debug'] = query.params['debug']
     
@@ -164,7 +172,7 @@ def get_url(query):
 
         if (query.params['name'] != None):
             parameters['name'] = query.params['name']
-
+            print "the name of the parameter is: ",parameters['name']
         
     elif (url == '/get_table_info'):
         if (query.params['name'] != None):
@@ -177,10 +185,13 @@ def get_url(query):
 
 
     query_str = urllib.urlencode(parameters)
-
-    if (not query_str):
+   
+    if (query_str != ''):
+        print "the query_str is: ", query_str
+        print "\n"
         url += '?' + query_str
-    
+        
+    #print "the url and the query_str is: ", url
     return url
 
 
@@ -208,7 +219,7 @@ class DLClient(object):
             
         if (q.url_type == 'del'):
             url = self.url + get_url(q)
-            print "the url is: ",url
+            print "\nthe url is: ",url,"\n"
             r = self.client.delete(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),

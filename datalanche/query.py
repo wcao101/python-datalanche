@@ -35,8 +35,14 @@ class DLQuery(object):
             'total' : None,
             'values' : None,
             'where' : None,
+            'unknown' : None,
         }
 
+    def unknown(self, unknown):
+        if self.params['unknown'] == None:
+            self.params['unknown'] = unknown
+        return self
+            
     def add_column(self,columns):
         
         if self.params['add_columns'] == None:
@@ -67,7 +73,7 @@ class DLQuery(object):
         
         return self
 
-    def create_table (self,table_name):
+    def create_table (self,table_name = None):
         
         self.url_type = 'post'
         self.base_url = '/create_table'
