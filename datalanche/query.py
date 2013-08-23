@@ -31,7 +31,7 @@ class DLQuery(object):
             'rename' : None,
             'select' : None,
             'set' : None,
-            'sorce' : None,
+            'sources' : None,
             'total' : None,
             'values' : None,
             'where' : None,

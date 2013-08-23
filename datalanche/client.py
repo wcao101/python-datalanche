@@ -22,127 +22,108 @@ def get_body(query = None):
         
     if(query.base_url == '/alter_table'):
         
-        for i,value in query.params.items():
-            ## print "testing...key is: ",i," value is: ",value
-                       
-            if(i == 'add_colunms' and value != None):
-                body['add_columns'] = value
+        if(query.params['add_columns'] != None):
+            body['add_columns'] = query.params['add_columns']
             
-            if(i == 'alter_columns' and value != None):
-                body['alter_columns'] = value
+        if(query.params['alter_columns'] != None):
+            body['alter_columns'] = query.params['alter_columns']
 
-            if(i == 'name' and value != None):
-                body['name'] = value
+        if(query.params['name'] != None):
+            body['name'] = query.params['name']
             
-            if(i == 'description' and value != None):
-                body['description'] = value
+        if(query.params['description'] != None):
+            body['description'] = query.params['description']
 
-            if(i == 'drop_columns' and value != None):
-                body['drop_columns'] = value
+        if(query.params['drop_columns'] != None):
+            body['drop_columns'] = query.params['drop_columns']
 
-            if(i == 'is_private' and value != None):
-                body['is_private'] = value
+        if(query.params['is_private'] != None):
+            body['is_private'] = query.params['is_private']
 
-            if(i == 'license' and value != None):
-                body['license'] = value
+        if(query.params['license'] != None):
+            body['license'] = query.params['license']
 
-            if(i == 'rename' and value != None):
-                body['rename'] = value
+        if(query.params['rename'] != None):
+            body['rename'] = query.params['rename']
 
-            if(i == 'sources' and value != None):
-                body['sources'] = value
+        if(query.params['sources'] != None):
+            body['sources'] = query.params['sources']
         
     elif(query.base_url == '/create_table'):
         
-        for i,value in query.params.items():
-            ## print "testing...key is: ",i," value is: ",value
-
-            if (i == 'columns' and value != None):
-                body['columns'] = value
+        if (query.params['columns'] != None):
+            body['columns'] = query.params['columns']
         
-            if (i == 'name' and value != None):
-                print "Right now testing the client side: name is: ", value
-                body['name'] = value
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
         
-            if (i == 'description' and value != None):
-                body['description'] = value
+        if (query.params['description'] != None):
+            body['description'] = query.params['description']
                 
-            if (i == 'is_private' and value!= None):
-                body['is_private'] = value
+        if (query.params['is_private'] != None):
+            body['is_private'] = query.params['is_private']
         
-            if (i == 'license' and value != None):
-                body['license'] = value
+        if (query.params['license'] != None):
+            body['license'] = query.params['license']
         
-            if (i == 'sources' and value != None):
-                body['sources'] = value
+        if (query.params['sources'] != None):
+            body['sources'] = query.params['sources']
             
     elif (query.base_url == '/delete_from'):
 
-        for i,value in query.params.items():
-            ## print "testing...key is: ",i," value is: ",value
-
-            if (i == 'name' and value != None):
-                body['name'] = value
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
         
-            if (i == 'where' and value != None): 
-                body['where'] = value
+        if (query.params['where'] != None): 
+            body['where'] = query.params['where']
         
     elif (query.base_url == '/insert_into'):
 
-        for i,value in query.params.items():
-            ## print "testing...key is: ",i," value is: ",value
-
-            if (i == 'name' and value != None):
-                body['name'] = value
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
         
-            if (i == 'values' and value != None):
-                body['values'] = value
+        if (query.params['values'] != None):
+            body['values'] = query.params['values']
         
     elif (query.base_url == '/select_from'):
-
-        for i,value in query.params.items():
-            ## print "testing...key is: ",i," value is: ",value
             
-            if (i == 'distinct' and value != None):
-                body['distinct'] = value
+        if (query.params['distinct'] != None):
+            body['distinct'] = query.params['distinct']
         
-            if (i == 'from_table' and value != None):
-                body['from'] = value
+        if (query.params['from_table'] != None):
+            body['from'] = query.params['from_table']
         
-            if (i == 'group_by' and value != None):
-                body['group_by'] = value
+        if (query.params['group_by'] != None):
+            body['group_by'] = query.params['group_by']
         
-            if (i == 'limit' and value != None):
-                body['limit'] = value
+        if (query.params['limit'] != None):
+            body['limit'] = query.params['limit']
         
-            if (i == 'offset' and value != None):
-                body['offset'] = value
+        if (query.params['offset'] != None):
+            body['offset'] = query.params['offset']
         
-            if (i == 'order_by' and value != None):
-                body['order_by'] = value
+        if (query.params['order_by'] != None):
+            body['order_by'] = query.params['order_by']
         
-            if (i == 'select' and value != None):
-                body['select'] = value
+        if (query.params['select'] != None):
+                body['select'] = query.params['select']
         
-            if (i == 'total' and value != None):
-                body['total'] = value
-        
-            if (i == 'where' and value != None):
-                body['where'] = value
-        
+        if (query.params['total'] != None):
+            body['total'] = query.params['total']
+            
+        if (query.params['where'] != None):
+            body['where'] = query.params['where']
+                
     elif (query.base_url == '/update'):
 
-        for i,value in query.params.items():
-           # print "testing...key is: ",i," value is: ",value
-
-            if (i == 'name' and value != None):
-                body['name'] = value
+        if (query.params['name'] != None):
+            body['name'] = query.params['name']
         
-            if (i == 'set' and value != None):
-                body['set'] = value
+        if (query.params['set'] != None):
+            body['set'] = query.params['set']
         
-            if (i == 'where' and value != None):
-                body['where'] = value
+        if (query.params['where'] != None):
+            body['where'] = query.params['where']
                 
     return body
         

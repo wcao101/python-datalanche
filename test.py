@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datalanche import *
+from requests.auth import HTTPBasicAuth
 import collections
 import decimal
 import csv
@@ -76,7 +77,7 @@ def handle_test(data, test):
         result = 'PASS'
     
     print "\n"
-    print "testing handle_test()...", test['name']
+    print "testing handle_test()...testing ", test['name']
     print json.dumps({
         'name': test['name'],
         'expected': test['expected'],
@@ -102,7 +103,7 @@ def handle_exception(e, test):
         result = 'PASS'
     
     print "\n"
-    print "Testing handle_exception()...", test['name']
+    print "Testing handle_exception()...testing ", test['name']
     print json.dumps({
         'name': test['name'],
         'expected': test['expected'],
@@ -119,46 +120,105 @@ def handle_exception(e, test):
         return True
     return False
 
+def use_raw_query(keys,params):
+    use_raw = False
+    if(keys not in params.keys()):
+        use_raw = True
+    
+    return use_raw
+
+# For testing unkown parameters. The API prevents users from adding
+# unknown parameters so we need to circumvent it.
+def query_raw(url_type,url,body):
+
+    client.client.auth = HTTPBasicAuth(client.auth_key, client.auth_secret),
+
+    if (url_type == 'del'):
+        client.client.delete ( url )
+        
+    elif (url_type == 'post'):
+        client.client.post ( 
+            url,
+            headers ={'Content-type':'application/json'},
+            data = json.dumps(body),
+        )
+        
+    elif (url_type == 'get'):
+        client.client.get ( url )
+    else:
+         raise DLException(r.status_code, r.json(), r.url)
+    
+
 def alter_table(test):
+
     success = False
     q = DLQuery()
+    keys = [
+        'name',
+        'rename',
+        'description',
+        'is_private',
+        'license',
+        'sources',
+        'add_columns',
+        'drop_columns',
+        'alter_columns',
+    ]
+
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
         
-        for key, value in test['parameters'].items():
-            if (key == 'name'):
-                q.alter_table(value)
-            elif(key == 'rename'):
-                q.rename(value)
-            elif(key == 'description'):
-                q.description(value)
-            elif(key == 'is_private'):
-                q.is_private(value)
-            elif(key == 'license'):
-                q.license(value)
-            elif(key == 'sources'):
-                q.sources(value)
-            elif(key == 'add_columns'):
-                if(isinstance(test['parameters']['add_columns'],list)):
-                    for i in test['parameters']['add_columns']:
-                        q.add_column(i)
-                else:
-                    q.params['add_columns'] = test['parameters']['add_columns']
-            elif(key == 'drop_columns'):
-                if(isinstance(test['parameters']['drop_columns'],list)):
-                    for i in test['parameters']['drop_columns']:
-                        q.drop_column(i)
-                else:
-                    q.params['drop_columns'] = test['parameters']['drop_columns']
-            elif(key == 'alter_columns'):
-                if(isinstance(test['parameters']['alter_columns'],dict) and 
-                   len(test['parameters']['alter_columns'].keys()) > 0):
-
-                    for key, value in test['parameters']['alter_columns'].items():
-                        q.alter_column(key, value)
-                else:
-                    q.params['alter_columns'] = test['parameters']['alter_columns']
+        ## Delete key and secret from params. They can screw up
+        ## raw query test and client's auth has already been set to them.
+        del test['parameters']['key']
+        del test['parameters']['secret']
+        
+        use_raw = use_raw_query(keys,test['parameters'])
+        if(use_raw == True):
+            try:
+                query_raw('post','/alter_table',test['parameters'])
+                success = handle_test(None, test)
+            except DLException as e:
+                success = handle_exception(e, test)
+            except Exception as e:
+                print repr(e)
+        
+        else:
+            for key, value in test['parameters'].items():
+            
+                if (key == 'name'):
+                    q.alter_table(value)
+                elif(key == 'rename'):
+                    q.rename(value)
+                elif(key == 'description'):
+                    q.description(value)
+                elif(key == 'is_private'):
+                    q.is_private(value)
+                elif(key == 'license'):
+                    q.license(value)
+                elif(key == 'sources'):
+                    q.sources(value)
+                elif(key == 'add_columns'):
+                    if(isinstance(test['parameters']['add_columns'],list)):
+                        for i in test['parameters']['add_columns']:
+                            q.add_column(i)
+                        else:
+                            q.params['add_columns'] = test['parameters']['add_columns']
+                elif(key == 'drop_columns'):
+                    if(isinstance(test['parameters']['drop_columns'],list)):
+                        for i in test['parameters']['drop_columns']:
+                            q.drop_column(i)
+                    else:
+                        q.params['drop_columns'] = test['parameters']['drop_columns']
+                elif(key == 'alter_columns'):
+                    if(isinstance(test['parameters']['alter_columns'],dict) and 
+                       len(test['parameters']['alter_columns'].keys()) > 0):
+                            
+                        for key, value in test['parameters']['alter_columns'].items():
+                            q.alter_column(key, value)
+                    else:
+                        q.params['alter_columns'] = test['parameters']['alter_columns']
 
 
         client.query(q)
@@ -170,30 +230,52 @@ def alter_table(test):
     return success
 
 def create_table(test):
+
+    keys = [
+        'name',
+        'description',
+        'is_private',
+        'license',
+        'sources',
+        'columns',
+    ]
+    
     success = False
     q = DLQuery()
+    
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        del test['parameters']['key']
+        del test['parameters']['secret']
 
-        if ('name' not in test['parameters'].keys()):
-            q.create_table(None)
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+            try:
+                query_raw('post','/create_table',test['parameters'])
+                success = handle_test(None, test)
+            except DLException as e:
+                success = handle_exception(e,test)
+            except Exception as e:
+                print repr(e)
         
-        for key,value in test['parameters'].items():
-            if(key == 'name'):
-                q.create_table(value)
-            elif(key == 'description'):
-                q.description(value)
-            elif(key == 'is_private'):
-                q.is_private(value)
-            elif(key == 'license'):
-                q.license(value)
-            elif(key == 'sources'):
-                q.sources(value)
-            elif(key == 'columns'):
-                q.columns(value)
-            else:
-                q.unknown(value)
+        else:
+            if ('name' not in test['parameters'].keys()):
+                 q.create_table(None)
+        
+            for key,value in test['parameters'].items():
+                if(key == 'name'):
+                    q.create_table(value)
+                elif(key == 'description'):
+                    q.description(value)
+                elif(key == 'is_private'):
+                    q.is_private(value)
+                elif(key == 'license'):
+                    q.license(value)
+                elif(key == 'sources'):
+                    q.sources(value)
+                elif(key == 'columns'):
+                    q.columns(value)
                 
         client.query(q)
         success = handle_test(None, test)
