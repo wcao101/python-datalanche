@@ -1,4 +1,3 @@
-*~
 *.py[cod]
 
 # C extensions
@@ -34,3 +33,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# random
+*~
+.DS_Store
+.idea
+*.iml
