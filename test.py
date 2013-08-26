@@ -122,29 +122,50 @@ def handle_exception(e, test):
 
 def use_raw_query(keys,params):
     use_raw = False
-    if(keys not in params.keys()):
-        use_raw = True
+    for k in params.keys():
+        if(k not in keys):
+            use_raw = True
     
     return use_raw
 
 # For testing unkown parameters. The API prevents users from adding
 # unknown parameters so we need to circumvent it.
-def query_raw(url_type,url,body):
+def query_raw(url_type,base_url,body):
 
-    client.client.auth = HTTPBasicAuth(client.auth_key, client.auth_secret),
+    client.client.auth = HTTPBasicAuth(client.auth_key, client.auth_secret)
+    url = client.url + base_url
 
     if (url_type == 'del'):
-        client.client.delete ( url )
-        
+        r = client.client.delete (
+            url,
+            headers ={'Content-type':'application/json'},
+            verify = client.verify_ssl    
+        )
+        if not 200 <= r.status_code < 300:
+            raise DLException(r.status_code, r.json(), r.url)
+        return r.json(object_pairs_hook=collections.OrderedDict)
+
     elif (url_type == 'post'):
-        client.client.post ( 
+        r = client.client.post ( 
             url,
             headers ={'Content-type':'application/json'},
             data = json.dumps(body),
+            verify = client.verify_ssl
         )
-        
+        if not 200 <= r.status_code < 300:
+            raise DLException(r.status_code, r.json(), r.url)
+        return r.json(object_pairs_hook=collections.OrderedDict)
+                
     elif (url_type == 'get'):
-        client.client.get ( url )
+        r = client.client.get (
+            url,
+            headers ={'Content-type':'application/json'},
+            verify = client.verify_ssl
+        )
+        if not 200 <= r.status_code < 300:
+            raise DLException(r.status_code, r.json(), r.url)
+        return r.json(object_pairs_hook=collections.OrderedDict)
+
     else:
          raise DLException(r.status_code, r.json(), r.url)
     
@@ -176,57 +197,54 @@ def alter_table(test):
         
         use_raw = use_raw_query(keys,test['parameters'])
         if(use_raw == True):
-            try:
                 query_raw('post','/alter_table',test['parameters'])
-                success = handle_test(None, test)
-            except DLException as e:
-                success = handle_exception(e, test)
-            except Exception as e:
-                print repr(e)
         
         else:
-            for key, value in test['parameters'].items():
-            
-                if (key == 'name'):
-                    q.alter_table(value)
-                elif(key == 'rename'):
-                    q.rename(value)
-                elif(key == 'description'):
-                    q.description(value)
-                elif(key == 'is_private'):
-                    q.is_private(value)
-                elif(key == 'license'):
-                    q.license(value)
-                elif(key == 'sources'):
-                    q.sources(value)
-                elif(key == 'add_columns'):
-                    if(isinstance(test['parameters']['add_columns'],list)):
-                        for i in test['parameters']['add_columns']:
-                            q.add_column(i)
-                        else:
-                            q.params['add_columns'] = test['parameters']['add_columns']
-                elif(key == 'drop_columns'):
-                    if(isinstance(test['parameters']['drop_columns'],list)):
-                        for i in test['parameters']['drop_columns']:
-                            q.drop_column(i)
+            if ('name' in test['parameters']
+                and test['parameters']['name'] != 'null'
+                and test['parameters']['name'] != ''):
+                q.alter_table(test['parameters']['name'])
+            else:
+                q.alter_table(None)
+            if('rename' in test['parameters']):
+                q.rename(test['parameters']['rename'])
+            if('description' in test['parameters']):
+                q.description(test['parameters']['description'])
+            if('is_private' in test['parameters']):
+                q.is_private(test['parameters']['is_private'])
+            if('license' in test['parameters']):
+                q.license(test['parameters']['license'])
+            if('sources' in test['parameters']):
+                q.sources(test['parameters']['sources'])
+            if('add_columns' in test['parameters']):
+                if(isinstance(test['parameters']['add_columns'],list)):
+                    for i in test['parameters']['add_columns']:
+                        q.add_column(i)
                     else:
-                        q.params['drop_columns'] = test['parameters']['drop_columns']
-                elif(key == 'alter_columns'):
-                    if(isinstance(test['parameters']['alter_columns'],dict) and 
-                       len(test['parameters']['alter_columns'].keys()) > 0):
-                            
-                        for key, value in test['parameters']['alter_columns'].items():
-                            q.alter_column(key, value)
-                    else:
-                        q.params['alter_columns'] = test['parameters']['alter_columns']
+                        q.params['add_columns'] = test['parameters']['add_columns']
+            if('drop_columns' in test['parameters']):
+                if(isinstance(test['parameters']['drop_columns'],list)):
+                    for i in test['parameters']['drop_columns']:
+                        q.drop_column(i)
+                else:
+                    q.params['drop_columns'] = test['parameters']['drop_columns']
+            if('alter_columns' in test['parameters']):
+                if(isinstance(test['parameters']['alter_columns'],dict) and 
+                   len(test['parameters']['alter_columns'].keys()) > 0):
+                    
+                    for key, value in test['parameters']['alter_columns'].items():
+                        q.alter_column(key, value)
+                else:
+                    q.params['alter_columns'] = test['parameters']['alter_columns']
 
 
-        client.query(q)
-        success = handle_test(None, test)
+        data = client.query(q)
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 def create_table(test):
@@ -242,6 +260,7 @@ def create_table(test):
     
     success = False
     q = DLQuery()
+    data = None
     
     try:
         client.auth_key = test['parameters']['key']
@@ -251,121 +270,185 @@ def create_table(test):
 
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
-            try:
-                query_raw('post','/create_table',test['parameters'])
-                success = handle_test(None, test)
-            except DLException as e:
-                success = handle_exception(e,test)
-            except Exception as e:
-                print repr(e)
-        
+            data = query_raw('post','/create_table',test['parameters'])
+            
+                    
         else:
-            if ('name' not in test['parameters'].keys()):
-                 q.create_table(None)
-        
-            for key,value in test['parameters'].items():
-                if(key == 'name'):
-                    q.create_table(value)
-                elif(key == 'description'):
-                    q.description(value)
-                elif(key == 'is_private'):
-                    q.is_private(value)
-                elif(key == 'license'):
-                    q.license(value)
-                elif(key == 'sources'):
-                    q.sources(value)
-                elif(key == 'columns'):
-                    q.columns(value)
+             
+            if('name' in test['parameters'] 
+               and test['parameters']['name'] != 'null'
+               and test['parameters']['name'] != ''):
+                q.create_table(test['parameters']['name'])
+            else:
+                q.create_table(None)
+            if('description' in test['parameters']):
+                q.description(test['parameters']['description'])
+            if('is_private' in test['parameters']):
+                q.is_private(test['parameters']['is_private'])
+            if('license' in test['parameters']):
+                q.license(test['parameters']['license'])
+            if('sources' in test['parameters']):
+                q.sources(test['parameters']['sources'])
+            if('columns' in test['parameters']):
+                q.columns(test['parameters']['columns'])
                 
-        client.query(q)
-        success = handle_test(None, test)
+            data = client.query(q)
+
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 def drop_table(test):
     success = False
     q = DLQuery()
+    keys = ['name']
+    data = None
+        
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-
-        if ('name' not in test['parameters'].keys()):
-            q.drop_table(None)
-
-        q.drop_table(test['parameters']['name'])
+        del test['parameters']['key']
+        del test['parameters']['secret']
         
-        client.query(q)
-        success = handle_test(None, test)
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+            data = query_raw('del','/drop_table',test['parameters'])
+        
+        else:
+            if ('name' in test['parameters']
+                and  test['parameters']['name'] != 'null'
+                and test['parameters']['name'] != ''):
+                q.drop_table(test['parameters']['name'])
+            else:
+                q.drop_table(None)
+            
+            data = client.query(q)
+                
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
-
+    
 def delete_from(test):
     success = False
     q = DLQuery()
+        
+    keys = ['name','where']
+    data = None
+    
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        del test['parameters']['key']
+        del test['parameters']['secret']
         
-        if ('name' not in test['parameters'].keys()):
-            q.delete_from(None)
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+            data = query_raw('post','/delete_from',test['parameters'])
+        
+        else:
+            if ('name' in test['parameters']
+                and test['parameters']['name'] != 'null'
+                and test['parameters']['name'] != ''):
+                q.delete_from(test['parameters']['name'])
+            else:
+                q.delete_from(None)
             
-        for key,value in test['parameters'].items():
-            if (key == 'name'):
-                q.delete_from(value)
-            elif(key == 'where'):
-                q.where(value)
-
-        client.query(q)
-        success = handle_test(None, test)
+            if('where' in test['parameters']):
+                q.where(test['parameters']['where'])
+           
+            data = client.query(q)
+            
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 def get_table_list(test):
     success = False
     q = DLQuery()
+    keys = list()
+    
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-        q.get_table_list()
-        data = client.query(q)
+        del test['parameters']['key']
+        del test['parameters']['secret']
+        
+        tables = list()
+                
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+                        
+            if (test['expected']['statusCode'] == 200):
+                data = query_raw('get','/get_table_list',test['parameters'])
+
+                
+                for i in range(0, data['num_tables']):
+                    table = data['tables'][i]
+
+                    try:
+                        del table['last_updated']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+
+                    try:
+                        del table['when_created']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                    
+                    for j in range(0, test['expected']['data']['num_tables']):
+                        if table == test['expected']['data']['tables'][j]:
+                            tables.append(table)
+                            break
 
         # getDatasetList() test is a bit different than the rest
         # because a server can have any number of datasets. We test
         # that the expected dataset(s) is listed rather than
         # checking the entire result is valid, but only if a valid
         # response is expected.
-
-        tables= list()
-        
-        for i in range(0, data['num_tables']):
-            table = data['tables'][i]
-
-            # too variable to test
-            try:
-                del table['last_updated']
-            except Exception as e:
-                # ignore error
-                print repr(e)
-            try:
-                del table['when_created']
-            except Exception as e:
-                # ignore error
-                print repr(e)
-
-            for j in range(0, test['expected']['data']['num_tables']):
-                if table == test['expected']['data']['tables'][j]:
-                    tables.append(table)
-                    break
-
+        else:
+            if (test['expected']['statusCode'] == 200):
+                q.get_table_list()
+                data = client.query(q)
+                
+                for i in range(0, data['num_tables']):
+                    table = data['tables'][i]
+                    
+                    # too variable to test
+                    try:
+                        del table['last_updated']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                        
+                    try:
+                        del table['when_created']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                        
+                    for j in range(0, test['expected']['data']['num_tables']):
+                        if table == test['expected']['data']['tables'][j]:
+                            tables.append(table)
+                            break
+                        
         data = collections.OrderedDict()
         data['num_tables'] = len(tables)
         data['tables'] = tables
@@ -374,123 +457,202 @@ def get_table_list(test):
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        # print repr(e)
+        pass
     return success
 
 def get_table_info(test):
     success = False
     q = DLQuery()
+    keys = ['name']
+    data = None
+
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        del test['parameters']['key']
+        del test['parameters']['secret']
         
-        if ('name' not in test['parameters'].keys()):
-            q.get_table_info(None)
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+           data =  query_raw('get','/get_table_info',test['parameters'])
 
-        q.get_table_info(test['parameters']['name'])
-        data = client.query(q)
+           # Delete date/time properties since they are probably
+           # different than the test data. This is okay because
+           # the server sets these values on write operations.
+           del data['when_created']
+           del data['last_updated']
 
-        # Delete date/time properties since they are probably
-        # different than the test data. This is okay because
-        # the server sets these values on write operations.
-        del data['when_created']
-        del data['last_updated']
+           success = handle_test(data, test)
+                      
+        else:
+            if ('name' in test['parameters']
+                and test['parameters']['name'] != 'null'
+                and test['parameters']['name'] != ''):
+                q.get_table_info(test['parameters']['name'])
+            else:
+                q.get_table_info(None)
 
-        success = handle_test(data, test)
+            data = client.query(q)
+
+            # Delete date/time properties since they are probably
+            # different than the test data. This is okay because
+            # the server sets these values on write operations.
+            del data['when_created']
+            del data['last_updated']
+
+            success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 def insert_into(test):
     success = False
     q = DLQuery()
+
+    keys = ['name','values']
+    data = None
+
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        del test['parameters']['key']
+        del test['parameters']['secret']
         
-        if ('name' not in test['parameters'].keys()):
-            q.insert_into(None)
+        use_raw = use_raw_query(keys, test['parameters'])
+        if (use_raw == True):
+            data = query_raw('post', '/insert_into', test['parameters'])
             
-        q.insert_into(test['parameters']['name'])
-        
-        if test['parameters']['values'] == 'dataset_file':
-            records = get_records_from_file(filename)
-            q.values(records)
-            client.quer(q)
         else:
-            q.values(test['parameters']['values'])
-            client.query(q)
+            if ('name' in test['parameters']
+                and test['parameters']['name'] != 'null'
+                and test['parameters']['name'] != ''):
+                q.insert_into(test['parameters']['name'])
+            else:
+                q.insert_into(None)
+                
+            if test['parameters']['values'] == 'dataset_file':
+                records = get_records_from_file(filename)
+                q.values(records)
+                data = client.quer(q)
+            else:
+                q.values(test['parameters']['values'])
+                data = client.query(q)
 
-        success = handle_test(None, test)
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 def select_from(test):
     
     success = False
     q = DLQuery()
+#    q.debug(True)
+    
+    keys = [
+        'select',
+        'distinct',
+        'from',
+        'where',
+        'group_by',
+        'order_by',
+        'offset',
+        'limit',
+        'total'
+    ]
+    data = None
+
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
-
-        if ('from_table' not in test['parameters'].keys()):
-            q.from_table(None)
+        del test['parameters']['key']
+        del test['parameters']['secret']
         
-        for key, value in test['parameters'].items():
-            if (key == 'select'):
-                q.select(value)
-            elif (key == 'distinct'):
-                q.distinct(value)
-            elif(key == 'from'):
-                q.from_table(value)
-            elif(key == 'where'):
-                q.where(value)
-            elif(key == 'group_by'):
-                q.group_by(value)
-            elif(key == 'order_by'):
-                q.order_by(value)
-            elif(key =='offset'):
-                q.offset(value)
-            elif(key == 'limit'):
-                q.limit(value)
-            elif(key == 'total'):
-                q.total(value)
-
-        data = client.query(q)
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
+            data = query_raw('post', '/select_from',test['parameters'])
+                        
+        else:
+            if('from' in test['parameters']
+               and test['parameters']['from'] != 'null'
+               and test['parameters']['from'] != ''):
+                q.from_table(test['parameters']['from'])
+            else:
+                q.from_table(None)
+            
+            if ('select' in test['parameters']):
+                q.select(test['parameters']['select'])
+            if ('distinct' in test['parameters']):
+                q.distinct(test['parameters']['distinct'])
+            if('where' in test['parameters']):
+                q.where(test['parameters']['where'])
+            if('group_by' in test['parameters']):
+                q.group_by(test['parameters']['group_by'])
+            if('order_by' in test['parameters']):
+                q.order_by(test['parameters']['order_by'])
+            if('offset' in test['parameters']):
+                q.offset(test['parameters']['offset'])
+            if('limit' in test['parameters']):
+                q.limit(test['parameters']['limit'])
+            if('total' in test['parameters']):
+                q.total(test['parameters']['total'])
+            
+            data = client.query(q)
+            
         success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
-
+    
 def update(test):
     success = False
     q = DLQuery()
+    
+    keys = ['name','set','where']
+    data = None
+    
     try:
         client.auth_key = test['parameters']['key']
         client.auth_secret = test['parameters']['secret']
+        del test['parameters']['key']
+        del test['parameters']['secret']
+        
+        use_raw = use_raw_query(keys, test['parameters'])
+        if(use_raw == True):
+            data = query_raw('post', '/update', test['parameters'])
+            
+        else:
 
-        for key, value in test['parameters'].items():
-            if (key == 'name'):
-                q.update(value)
-            elif(key =='set'):
-                q.set(value)
-            elif(key=='where'):
-                q.where(value)
+            if ('name' in test['parameters']
+                and test['parameters']['name']
+                and test['parameters']['name']):
+                q.update(test['parameters']['name'])
+            else:
+                q.update(None)
 
-        client.query(q)
+            if('set' in test['parameters']):
+                q.set(test['parameters']['set'])
+            if('where' in test['parameters']):
+                q.where(test['parameters']['where'])
 
-        success = handle_test(None, test)
+            data = client.query(q)
+
+        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
-        print repr(e)
+        #print repr(e)
+        pass
     return success
 
 q = DLQuery()

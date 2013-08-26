@@ -124,7 +124,8 @@ def get_body(query = None):
         
         if (query.params['where'] != None):
             body['where'] = query.params['where']
-                
+               
+    print json.dumps(body)
     return body
         
    
@@ -133,11 +134,11 @@ def get_body(query = None):
 # passwords, and other potentially sensitive information.
 def get_url(query = None):
 
-    if (query.base_url ==  '/create_table'):
-        if ('name' not in query.params.keys()):
-            print "the there is no name for creating the table"
-            return None
-        pass
+    # if (query.base_url ==  '/create_table'):
+    #     if ('name' not in query.params.keys()):
+    #         print "the there is no name for creating the table"
+    #         return None
+    #     pass
 
     if (query == None):
         return '/'
@@ -153,8 +154,7 @@ def get_url(query = None):
 
         if (query.params['name'] != None):
             parameters['name'] = query.params['name']
-            print "the name of the parameter is: ",parameters['name']
-        
+                   
     elif (url == '/get_table_info'):
         if (query.params['name'] != None):
             parameters['name'] = query.params['name']
@@ -199,15 +199,16 @@ class DLClient(object):
             return None
             
         if (q.url_type == 'del'):
-            url = self.url + get_url(q)
-            print "\nthe url is: ",url,"\n"
             r = self.client.delete(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+                headers ={'Content-type':'application/json'},
                 verify = self.verify_ssl
             )
             if not 200 <= r.status_code < 300:
                raise DLException(r.status_code, r.json(), r.url)
+
+            return r.json(object_pairs_hook=collections.OrderedDict)
 
 
         elif (q.url_type == 'post'):
@@ -221,14 +222,19 @@ class DLClient(object):
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)
                 
+            return r.json(object_pairs_hook=collections.OrderedDict)
+                
         elif (q.url_type == 'get'):
             r = self.client.get(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
+                headers ={'Content-type':'application/json'},
                 verify = self.verify_ssl
             )
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)
-
+                
+            return r.json(object_pairs_hook=collections.OrderedDict)
+                
         else:
             raise DLException(r.status_code, r.json(), r.url)

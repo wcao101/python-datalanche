@@ -35,26 +35,22 @@ class DLQuery(object):
             'total' : None,
             'values' : None,
             'where' : None,
-            'unknown' : None,
         }
-
-    def unknown(self, unknown):
-        if self.params['unknown'] == None:
-            self.params['unknown'] = unknown
-        return self
-            
+        
     def add_column(self,columns):
         
         if self.params['add_columns'] == None:
             self.params['add_columns'] = []
-            self.params['add_columns'].append(columns)
+
+        self.params['add_columns'].append(columns)
 
         return self
     
     def alter_column(self,column_name, column_object):
         
         if self.params['alter_columns'] == None:
-            self.params['alter_columns'] ={}
+            self.params['alter_columns'] = {}
+
         self.params['alter_columns']['column_name'] = column_object
 
         return self
@@ -81,9 +77,9 @@ class DLQuery(object):
         
         return self
 
-    def debug(self,bool):
+    def debug(self,bool_type = None):
         
-        self.params['debug'] = bool
+        self.params['debug'] = bool_type
 
         return self
 
@@ -101,9 +97,9 @@ class DLQuery(object):
         
         return self
 
-    def distinct(self,bool):
+    def distinct(self,bool_type = None):
         
-        self.params['distinct'] = bool
+        self.params['distinct'] = bool_type
 
         return self
 
