@@ -51,7 +51,7 @@ class DLQuery(object):
         if self.params['alter_columns'] == None:
             self.params['alter_columns'] = {}
 
-        self.params['alter_columns']['column_name'] = column_object
+        self.params['alter_columns'][column_name] = column_object
 
         return self
 
@@ -141,56 +141,57 @@ class DLQuery(object):
 
         return self
 
-    def group_by(self,columns):
+    def group_by(self,columns = None):
 
         self.params['group_by'] = columns
 
         return self
 
-    def insert_into(self,table_name):
+    def insert_into(self,table_name = None):
 
         self.url_type = 'post'
         self.base_url = '/insert_into'
+        self.params['name'] = table_name
 
         return self
 
-    def is_private(self,bool):
+    def is_private(self,bool_type = None):
         
-        self.params['is_private'] = bool
+        self.params['is_private'] = bool_type
 
         return self
 
-    def license(self,license_object):
+    def license(self,license_object = None):
         
         self.params['license'] = license_object
 
         return self
 
-    def limit(self,integer):
+    def limit(self,integer = None):
         
         self.params['limit'] = integer
 
         return self
 
-    def offset(self,integer):
+    def offset(self,integer = None):
 
         self.params['offset'] = integer
 
         return self
 
-    def order_by(self,object_array):
+    def order_by(self,object_array = collections.OrderedDict()):
         
         self.params['order_by'] = object_array
 
         return self
 
-    def rename(self,table_name):
+    def rename(self,table_name = None):
 
         self.params['rename'] = table_name
 
         return self
 
-    def select(self,columns):
+    def select(self,columns = None):
 
         self.url_type = 'post'
         self.base_url = '/select_from'
@@ -198,25 +199,25 @@ class DLQuery(object):
 
         return self
 
-    def set(self,form_map):
+    def set(self,form_map = None):
 
         self.params['set'] = form_map
 
         return self
 
-    def sources(self,object_array):
+    def sources(self,object_array = collections.OrderedDict()):
         
         self.params['sources'] = object_array
 
         return self
 
-    def total(self,bool):
+    def total(self,bool_type = None):
         
-        self.params['total'] = bool
+        self.params['total'] = bool_type
 
         return self
 
-    def update(self,table_name):
+    def update(self,table_name = None):
 
         self.url_type = 'post'
         self.base_url = '/update'
@@ -224,15 +225,15 @@ class DLQuery(object):
 
         return self
 
-    def values(self,rows):
+    def values(self,rows = None):
 
         self.params['values'] = rows
 
         return self
 
-    def where(self,query_filter):
+    def where(self, expression = None):
         
-        self.params['where'] = query_filter
+        self.params['where'] = expression.json()
 
         return self
         

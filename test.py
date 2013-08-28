@@ -77,7 +77,7 @@ def handle_test(data, test):
         result = 'PASS'
     
     print "\n"
-    print "testing handle_test()...testing ", test['name']
+    print "Testing handle_test( ", test['name']," ) ..."
     print json.dumps({
         'name': test['name'],
         'expected': test['expected'],
@@ -96,30 +96,62 @@ def handle_test(data, test):
 
 def handle_exception(e, test):
     result = 'FAIL'
+    message =  e.response['message']
+    
+    
+    ## Postgres errors sometimes start with "Error:" or "error:". Not sure why.
+    ## We should be case-insenitive in this case, and match the definition in
+    ## the tests.
 
-    if (e.status_code == test['expected']['statusCode']
-        and e.response['message'] == test['expected']['data']
-        and e.response['code'] == test['expected']['exception']):
-        result = 'PASS'
+    if (message[0] == 'e' 
+        and message[1] == 'r' 
+        and message[2] == 'r'):
+        message =  message.replace(message[0],'E',1)
+                
+        if (e.status_code == test['expected']['statusCode']
+            and message == test['expected']['data']
+            and e.response['code'] == test['expected']['exception']):
+            result = 'PASS'
+            
+        print "\n"
+        print "Testing handle_exception( ", test['name']," ) ..."
+        print json.dumps({
+            'name': test['name'],
+            'expected': test['expected'],
+            'actual': {
+                  'statusCode': e.status_code,
+                'exception': e.response['code'],
+                'data': message,
+            },
+            'result': result,
+        })
+        print "\n"
+            
+    else:
+        if (e.status_code == test['expected']['statusCode']
+            and e.response['message'] == test['expected']['data']
+            and e.response['code'] == test['expected']['exception']):
+            result = 'PASS'
+            
     
-    print "\n"
-    print "Testing handle_exception()...testing ", test['name']
-    print json.dumps({
-        'name': test['name'],
-        'expected': test['expected'],
-        'actual': {
-            'statusCode': e.status_code,
-            'exception': e.response['code'],
-            'data': e.response['message'],
-        },
-        'result': result,
-    })
-    print "\n"
-    
+        print "\n"
+        print "Testing handle_exception( ", test['name']," ) ..."
+        print json.dumps({
+            'name': test['name'],
+            'expected': test['expected'],
+            'actual': {
+                'statusCode': e.status_code,
+                'exception': e.response['code'],
+                'data': e.response['message'],
+            },
+            'result': result,
+        })
+        print "\n"
+        
     if result == 'PASS':
         return True
     return False
-
+    
 def use_raw_query(keys,params):
     use_raw = False
     for k in params.keys():
@@ -145,7 +177,7 @@ def query_raw(url_type,base_url,body):
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
 
-    elif (url_type == 'post'):
+    if (url_type == 'post'):
         r = client.client.post ( 
             url,
             headers ={'Content-type':'application/json'},
@@ -156,7 +188,7 @@ def query_raw(url_type,base_url,body):
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
                 
-    elif (url_type == 'get'):
+    if (url_type == 'get'):
         r = client.client.get (
             url,
             headers ={'Content-type':'application/json'},
@@ -165,10 +197,6 @@ def query_raw(url_type,base_url,body):
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), r.url)
         return r.json(object_pairs_hook=collections.OrderedDict)
-
-    else:
-         raise DLException(r.status_code, r.json(), r.url)
-    
 
 def alter_table(test):
 
@@ -271,8 +299,7 @@ def create_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('post','/create_table',test['parameters'])
-            
-                    
+                            
         else:
              
             if('name' in test['parameters'] 
@@ -389,21 +416,22 @@ def get_table_list(test):
                 
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
-                        
+            print "The params is using raw_query..\n"
+            print "and the data is: ", data, "\n"
+                    
             if (test['expected']['statusCode'] == 200):
                 data = query_raw('get','/get_table_list',test['parameters'])
-
-                
+                               
                 for i in range(0, data['num_tables']):
                     table = data['tables'][i]
-
+                    
                     try:
                         del table['last_updated']
                     except Exception as e:
                         # ignore error
                         #print repr(e)
                         pass
-
+                        
                     try:
                         del table['when_created']
                     except Exception as e:
@@ -415,7 +443,7 @@ def get_table_list(test):
                         if table == test['expected']['data']['tables'][j]:
                             tables.append(table)
                             break
-
+        
         # getDatasetList() test is a bit different than the rest
         # because a server can have any number of datasets. We test
         # that the expected dataset(s) is listed rather than
@@ -425,7 +453,11 @@ def get_table_list(test):
             if (test['expected']['statusCode'] == 200):
                 q.get_table_list()
                 data = client.query(q)
-                
+
+                print "The params is using default query..\n"
+                print "and the data is: ", data
+
+
                 for i in range(0, data['num_tables']):
                     table = data['tables'][i]
                     
@@ -694,9 +726,7 @@ for filename in files:
             test['parameters']['key'] = valid_key;
         if test['parameters']['secret'] == 'valid_secret':
             test['parameters']['secret'] = valid_secret;
-        #### for debug....####
-        #print test['parameters']['distinct']
-
+       
         success = False
 
         if test['method'] == 'alter_table':

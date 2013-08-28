@@ -28,7 +28,7 @@ class DLExpression(object):
             json_list = list()
             for i in range(0, len(self._filters)):
                 item = collections.OrderedDict()
-                if isinstance(self._filters[i], DLFilter) == True:
+                if isinstance(self._filters[i], DLExpression) == True:
                     item = self._filters[i].json()
                 else:
                     item = self._filters[i]

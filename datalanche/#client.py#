@@ -224,8 +224,7 @@ class DLClient(object):
                 )
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)
-                pass
-
+            
             if (q.base_url == '/select_from'):
                 return r.json(object_pairs_hook=collections.OrderedDict)
             
