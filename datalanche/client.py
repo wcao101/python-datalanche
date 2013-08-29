@@ -82,10 +82,8 @@ def get_body(query = None):
     elif (query.base_url == '/insert_into'):
 
         if (query.params['name'] != None):
-            print "the name of the table is: ", query.params['name']
             body['name'] = query.params['name']
-            print "the name in the body is: ",body['name']
-        
+                    
         if (query.params['values'] != None):
             body['values'] = query.params['values']
         
@@ -128,7 +126,9 @@ def get_body(query = None):
                                 
         if (query.params['where'] != None):
             body['where'] = query.params['where']
-           
+            print "\n*************** the body where is: ", body['where'], "****************\n"
+
+    print "the body is: ", body
     return body
         
    
@@ -224,8 +224,7 @@ class DLClient(object):
                 )
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)
-                pass
-
+            
             if (q.base_url == '/select_from'):
                 return r.json(object_pairs_hook=collections.OrderedDict)
             

@@ -5,6 +5,7 @@ import json
 import requests
 import collections
 from exception import DLException
+from expression import DLExpression
 from requests.auth import HTTPBasicAuth
 
 
@@ -232,8 +233,15 @@ class DLQuery(object):
         return self
 
     def where(self, expression = None):
-        
-        self.params['where'] = expression.json()
+        print "the type of e is: ", type(expression)
+        d = DLExpression()
+        print "the type of d is: ", type(d)
 
+        if(isinstance(expression, type(d))):
+            print "using the expression class to *** SELECT ***"
+            self.params['where'] = expression.json()
+        else:
+            self.params['where'] = expression
+        
         return self
         

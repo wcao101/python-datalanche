@@ -76,20 +76,21 @@ def handle_test(data, test):
     if data == test['expected']['data']:
         result = 'PASS'
     
-    print "\n"
-    print "Testing handle_test( ", test['name']," ) ..."
-    print json.dumps({
-        'name': test['name'],
-        'expected': test['expected'],
-        'actual': {
-            'statusCode': 200,
-            'exception': '',
-            'data': data,
-        },
-        'result': result,
-    })
+    if result == 'FAIL':
+        print "\n"
+        print "Testing handle_test( ", test['name']," ) ..."
+        print json.dumps({
+            'name': test['name'],
+            'expected': test['expected'],
+            'actual': {
+                'statusCode': 200,
+                'exception': '',
+                'data': data,
+            },
+            'result': result,
+        })
+        print "\n"
 
-    print "\n"
     if result == 'PASS':
         return True
     return False
@@ -112,6 +113,7 @@ def handle_exception(e, test):
             and message == test['expected']['data']
             and e.response['code'] == test['expected']['exception']):
             result = 'PASS'
+        
             
         print "\n"
         print "Testing handle_exception( ", test['name']," ) ..."
@@ -119,21 +121,20 @@ def handle_exception(e, test):
             'name': test['name'],
             'expected': test['expected'],
             'actual': {
-                  'statusCode': e.status_code,
-                'exception': e.response['code'],
+                'statusCode': e.status_code,
+                    'exception': e.response['code'],
                 'data': message,
             },
             'result': result,
         })
         print "\n"
-            
+        
     else:
         if (e.status_code == test['expected']['statusCode']
             and e.response['message'] == test['expected']['data']
             and e.response['code'] == test['expected']['exception']):
             result = 'PASS'
             
-    
         print "\n"
         print "Testing handle_exception( ", test['name']," ) ..."
         print json.dumps({
@@ -178,6 +179,7 @@ def query_raw(url_type,base_url,body):
         return r.json(object_pairs_hook=collections.OrderedDict)
 
     if (url_type == 'post'):
+        print "In the test.py use_query, the body['where'] is: ******* ", body
         r = client.client.post ( 
             url,
             headers ={'Content-type':'application/json'},
@@ -348,8 +350,9 @@ def drop_table(test):
         else:
             if ('name' in test['parameters']
                 and  test['parameters']['name'] != 'null'
-                and test['parameters']['name'] != ''):
+                ):
                 q.drop_table(test['parameters']['name'])
+                
             else:
                 q.drop_table(None)
             
@@ -609,9 +612,11 @@ def select_from(test):
         
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
+            print "select *** using the raw_query *** ..."
             data = query_raw('post', '/select_from',test['parameters'])
                         
         else:
+            print "select *** using the query ****..."
             if('from' in test['parameters']
                and test['parameters']['from'] != 'null'
                and test['parameters']['from'] != ''):
@@ -624,6 +629,7 @@ def select_from(test):
             if ('distinct' in test['parameters']):
                 q.distinct(test['parameters']['distinct'])
             if('where' in test['parameters']):
+                print "The type of the test['parameters']['where'] is: ", type(test['parameters']['where'])
                 q.where(test['parameters']['where'])
             if('group_by' in test['parameters']):
                 q.group_by(test['parameters']['group_by'])
