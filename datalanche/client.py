@@ -30,8 +30,8 @@ def get_body(query = None):
         if(query.params['alter_columns'] != None):
             body['alter_columns'] = query.params['alter_columns']
         
-        if(query.params['name'] != None):
-            body['name'] = query.params['name']
+        if(query.params['table_name'] != None):
+            body['table_name'] = query.params['table_name']
             
         if(query.params['description'] != None):
             body['description'] = query.params['description']
@@ -56,8 +56,8 @@ def get_body(query = None):
         if (query.params['columns'] != None):
             body['columns'] = query.params['columns']
         
-        if (query.params['name'] != None):
-            body['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            body['table_name'] = query.params['table_name']
         
         if (query.params['description'] != None):
             body['description'] = query.params['description']
@@ -73,16 +73,16 @@ def get_body(query = None):
             
     elif (query.base_url == '/delete_from'):
 
-        if (query.params['name'] != None):
-            body['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            body['table_name'] = query.params['table_name']
         
         if (query.params['where'] != None): 
             body['where'] = query.params['where']
         
     elif (query.base_url == '/insert_into'):
 
-        if (query.params['name'] != None):
-            body['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            body['table_name'] = query.params['table_name']
                     
         if (query.params['values'] != None):
             body['values'] = query.params['values']
@@ -118,8 +118,8 @@ def get_body(query = None):
                 
     elif (query.base_url == '/update'):
 
-        if (query.params['name'] != None):
-            body['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            body['table_name'] = query.params['table_name']
         
         if (query.params['set'] != None):
             body['set'] = query.params['set']
@@ -137,12 +137,6 @@ def get_body(query = None):
 # passwords, and other potentially sensitive information.
 def get_url(query = None):
 
-    # if (query.base_url ==  '/create_table'):
-    #     if ('name' not in query.params.keys()):
-    #         print "the there is no name for creating the table"
-    #         return None
-    #     pass
-
     if (query == None):
         return '/'
     
@@ -155,12 +149,12 @@ def get_url(query = None):
     
     if (url == '/drop_table'):
 
-        if (query.params['name'] != None):
-            parameters['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            parameters['table_name'] = query.params['table_name']
                    
     elif (url == '/get_table_info'):
-        if (query.params['name'] != None):
-            parameters['name'] = query.params['name']
+        if (query.params['table_name'] != None):
+            parameters['table_name'] = query.params['table_name']
 
         
     elif (url == '/get_table_list'):
@@ -201,7 +195,6 @@ class DLClient(object):
         self.auth_secret = secret
         
     def query(self,q = None):
-       # print "NOW, q.params['rename'] is: ", q.params['rename']
         
         if (q == None):
             print "Error: query is None."

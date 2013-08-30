@@ -28,7 +28,7 @@ class DLQuery(object):
             'limit' : None,
             'offset' : None,
             'order_by' : None,
-            'name' : None,
+            'table_name' : None,
             'rename' : None,
             'select' : None,
             'set' : None,
@@ -60,7 +60,7 @@ class DLQuery(object):
         
         self.url_type = 'post'
         self.base_url = '/alter_table'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
         
         return self
         
@@ -74,7 +74,7 @@ class DLQuery(object):
         
         self.url_type = 'post'
         self.base_url = '/create_table'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
         
         return self
 
@@ -88,7 +88,7 @@ class DLQuery(object):
 
         self.url_type = 'post'
         self.base_url = '/delete_from'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
 
         return self
 
@@ -117,11 +117,11 @@ class DLQuery(object):
 
         self.url_type = 'del'
         self.base_url = '/drop_table'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
 
         return self
 
-    def from_table(self,tables):
+    def from_table(self,tables = None):
         
         self.params['from_table'] = tables
 
@@ -131,7 +131,7 @@ class DLQuery(object):
 
         self.url_type = 'get'
         self.base_url = '/get_table_info'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
 
         return self
 
@@ -152,7 +152,7 @@ class DLQuery(object):
 
         self.url_type = 'post'
         self.base_url = '/insert_into'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
 
         return self
 
@@ -222,7 +222,7 @@ class DLQuery(object):
 
         self.url_type = 'post'
         self.base_url = '/update'
-        self.params['name'] = table_name
+        self.params['table_name'] = table_name
 
         return self
 
@@ -238,7 +238,6 @@ class DLQuery(object):
         print "the type of d is: ", type(d)
 
         if(isinstance(expression, type(d))):
-            print "using the expression class to *** SELECT ***"
             self.params['where'] = expression.json()
         else:
             self.params['where'] = expression
