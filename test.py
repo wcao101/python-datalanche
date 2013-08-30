@@ -36,7 +36,7 @@ if len(sys.argv) >= 7:
     else:
         verify_ssl = True
 
-client = DLClient(key = valid_key, secret = valid_secret, host = host, port = port, verify_ssl = verify_ssl)
+client = DLClient(host = host, port = port, verify_ssl = verify_ssl)
 
 
 def get_records_from_file(filename):
@@ -194,6 +194,7 @@ def query_raw(url_type,base_url,body):
         r = client.client.get (
             url,
             headers ={'Content-type':'application/json'},
+            data = json.dumps(body),
             verify = client.verify_ssl
         )
         if not 200 <= r.status_code < 300:
@@ -217,8 +218,8 @@ def alter_table(test):
     ]
 
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         
         ## Delete key and secret from params. They can screw up
         ## raw query test and client's auth has already been set to them.
@@ -293,8 +294,8 @@ def create_table(test):
     data = None
     
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
 
@@ -338,8 +339,8 @@ def drop_table(test):
     data = None
         
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -374,8 +375,8 @@ def delete_from(test):
     data = None
     
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -410,8 +411,9 @@ def get_table_list(test):
     keys = list()
     
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        print "the key is: ", test['parameters']['key']," and the secret is: ",test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -420,11 +422,10 @@ def get_table_list(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             print "The params is using raw_query..\n"
-            print "and the data is: ", data, "\n"
-                    
+            data = query_raw('get','/get_table_list',test['parameters'])
+                 
             if (test['expected']['statusCode'] == 200):
-                data = query_raw('get','/get_table_list',test['parameters'])
-                               
+                   
                 for i in range(0, data['num_tables']):
                     table = data['tables'][i]
                     
@@ -446,6 +447,12 @@ def get_table_list(test):
                         if table == test['expected']['data']['tables'][j]:
                             tables.append(table)
                             break
+                            
+            data = collections.OrderedDict()
+            data['num_tables'] = len(tables)
+            data['tables'] = tables
+            
+            success = handle_test(data, test)
         
         # getDatasetList() test is a bit different than the rest
         # because a server can have any number of datasets. We test
@@ -453,13 +460,10 @@ def get_table_list(test):
         # checking the entire result is valid, but only if a valid
         # response is expected.
         else:
+            q.get_table_list()
+            data = client.query(q)
+
             if (test['expected']['statusCode'] == 200):
-                q.get_table_list()
-                data = client.query(q)
-
-                print "The params is using default query..\n"
-                print "and the data is: ", data
-
 
                 for i in range(0, data['num_tables']):
                     table = data['tables'][i]
@@ -484,11 +488,12 @@ def get_table_list(test):
                             tables.append(table)
                             break
                         
-        data = collections.OrderedDict()
-        data['num_tables'] = len(tables)
-        data['tables'] = tables
+            data = collections.OrderedDict()
+            data['num_tables'] = len(tables)
+            data['tables'] = tables
+            
+            success = handle_test(data, test)
 
-        success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -503,8 +508,8 @@ def get_table_info(test):
     data = None
 
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -552,8 +557,8 @@ def insert_into(test):
     data = None
 
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -589,8 +594,7 @@ def select_from(test):
     
     success = False
     q = DLQuery()
-#    q.debug(True)
-    
+
     keys = [
         'select',
         'distinct',
@@ -605,8 +609,8 @@ def select_from(test):
     data = None
 
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -614,12 +618,15 @@ def select_from(test):
         if (use_raw == True):
             print "select *** using the raw_query *** ..."
             data = query_raw('post', '/select_from',test['parameters'])
+            print "\n and the data is: ", data, "\n"
+            
+            success = handle_test(data, test)
                         
         else:
             print "select *** using the query ****..."
             if('from' in test['parameters']
                and test['parameters']['from'] != 'null'
-               and test['parameters']['from'] != ''):
+            ):
                 q.from_table(test['parameters']['from'])
             else:
                 q.from_table(None)
@@ -629,7 +636,6 @@ def select_from(test):
             if ('distinct' in test['parameters']):
                 q.distinct(test['parameters']['distinct'])
             if('where' in test['parameters']):
-                print "The type of the test['parameters']['where'] is: ", type(test['parameters']['where'])
                 q.where(test['parameters']['where'])
             if('group_by' in test['parameters']):
                 q.group_by(test['parameters']['group_by'])
@@ -643,8 +649,9 @@ def select_from(test):
                 q.total(test['parameters']['total'])
             
             data = client.query(q)
-            
-        success = handle_test(data, test)
+            print " \n and the data is: ", data
+            success = handle_test(data, test)
+
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -660,8 +667,8 @@ def update(test):
     data = None
     
     try:
-        client.auth_key = test['parameters']['key']
-        client.auth_secret = test['parameters']['secret']
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
         del test['parameters']['key']
         del test['parameters']['secret']
         
@@ -760,7 +767,7 @@ for filename in files:
         if success == True:
             num_passed = num_passed + 1
 
-print '-------------------------------'
+print '\n-------------------------------'
 print 'passed: ' + str(num_passed)
 print 'failed: ' + str(total_tests - num_passed)
 print 'total:  ' + str(total_tests)

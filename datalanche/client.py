@@ -194,6 +194,12 @@ class DLClient(object):
         if port != None:
             self.url = self.url + ':' + str(port)
 
+    def key (self, key = None):
+        self.auth_key = key
+        
+    def secret (self, secret = None):
+        self.auth_secret = secret
+        
     def query(self,q = None):
        # print "NOW, q.params['rename'] is: ", q.params['rename']
         
@@ -210,10 +216,7 @@ class DLClient(object):
             )
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)
-                                
-            #return r.json(object_pairs_hook=collections.OrderedDict)
-
-
+                        
         elif (q.url_type == 'post'):
             r = self.client.post(
                 url = self.url + get_url(q),
@@ -227,8 +230,7 @@ class DLClient(object):
             
             if (q.base_url == '/select_from'):
                 return r.json(object_pairs_hook=collections.OrderedDict)
-            
-                
+                            
         elif (q.url_type == 'get'):
             r = self.client.get(
                 url = self.url + get_url(q),
