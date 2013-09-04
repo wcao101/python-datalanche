@@ -206,7 +206,7 @@ def alter_table(test):
     success = False
     q = DLQuery()
     keys = [
-        'name',
+        'table_name',
         'rename',
         'description',
         'is_private',
@@ -231,10 +231,10 @@ def alter_table(test):
                 query_raw('post','/alter_table',test['parameters'])
         
         else:
-            if ('name' in test['parameters']
-                and test['parameters']['name'] != 'null'
-                and test['parameters']['name'] != ''):
-                q.alter_table(test['parameters']['name'])
+            if ('table_name' in test['parameters']
+                and test['parameters']['table_name'] != 'null'
+                and test['parameters']['table_name'] != ''):
+                q.alter_table(test['parameters']['table_name'])
             else:
                 q.alter_table(None)
             if('rename' in test['parameters']):
@@ -281,7 +281,7 @@ def alter_table(test):
 def create_table(test):
 
     keys = [
-        'name',
+        'table_name',
         'description',
         'is_private',
         'license',
@@ -305,10 +305,10 @@ def create_table(test):
                             
         else:
              
-            if('name' in test['parameters'] 
-               and test['parameters']['name'] != 'null'
-               and test['parameters']['name'] != ''):
-                q.create_table(test['parameters']['name'])
+            if('table_name' in test['parameters'] 
+               and test['parameters']['table_name'] != 'null'
+               and test['parameters']['table_name'] != ''):
+                q.create_table(test['parameters']['table_name'])
             else:
                 q.create_table(None)
             if('description' in test['parameters']):
@@ -335,7 +335,7 @@ def create_table(test):
 def drop_table(test):
     success = False
     q = DLQuery()
-    keys = ['name']
+    keys = ['table_name']
     data = None
         
     try:
@@ -349,10 +349,10 @@ def drop_table(test):
             data = query_raw('del','/drop_table',test['parameters'])
         
         else:
-            if ('name' in test['parameters']
-                and  test['parameters']['name'] != 'null'
+            if ('table_name' in test['parameters']
+                and  test['parameters']['table_name'] != 'null'
                 ):
-                q.drop_table(test['parameters']['name'])
+                q.drop_table(test['parameters']['table_name'])
                 
             else:
                 q.drop_table(None)
@@ -371,7 +371,7 @@ def delete_from(test):
     success = False
     q = DLQuery()
         
-    keys = ['name','where']
+    keys = ['table_name','where']
     data = None
     
     try:
@@ -385,10 +385,10 @@ def delete_from(test):
             data = query_raw('post','/delete_from',test['parameters'])
         
         else:
-            if ('name' in test['parameters']
-                and test['parameters']['name'] != 'null'
-                and test['parameters']['name'] != ''):
-                q.delete_from(test['parameters']['name'])
+            if ('table_name' in test['parameters']
+                and test['parameters']['table_name'] != 'null'
+                and test['parameters']['table_name'] != ''):
+                q.delete_from(test['parameters']['table_name'])
             else:
                 q.delete_from(None)
             
@@ -504,7 +504,7 @@ def get_table_list(test):
 def get_table_info(test):
     success = False
     q = DLQuery()
-    keys = ['name']
+    keys = ['table_name']
     data = None
 
     try:
@@ -526,10 +526,10 @@ def get_table_info(test):
            success = handle_test(data, test)
                       
         else:
-            if ('name' in test['parameters']
-                and test['parameters']['name'] != 'null'
-                and test['parameters']['name'] != ''):
-                q.get_table_info(test['parameters']['name'])
+            if ('table_name' in test['parameters']
+                and test['parameters']['table_name'] != 'null'
+                and test['parameters']['table_name'] != ''):
+                q.get_table_info(test['parameters']['table_name'])
             else:
                 q.get_table_info(None)
 
@@ -553,7 +553,7 @@ def insert_into(test):
     success = False
     q = DLQuery()
 
-    keys = ['name','values']
+    keys = ['table_name','values']
     data = None
 
     try:
@@ -567,10 +567,10 @@ def insert_into(test):
             data = query_raw('post', '/insert_into', test['parameters'])
             
         else:
-            if ('name' in test['parameters']
-                and test['parameters']['name'] != 'null'
-                and test['parameters']['name'] != ''):
-                q.insert_into(test['parameters']['name'])
+            if ('table_name' in test['parameters']
+                and test['parameters']['table_name'] != 'null'
+                and test['parameters']['table_name'] != ''):
+                q.insert_into(test['parameters']['table_name'])
             else:
                 q.insert_into(None)
                 
@@ -663,7 +663,7 @@ def update(test):
     success = False
     q = DLQuery()
     
-    keys = ['name','set','where']
+    keys = ['table_name','set','where']
     data = None
     
     try:
@@ -678,10 +678,10 @@ def update(test):
             
         else:
 
-            if ('name' in test['parameters']
-                and test['parameters']['name']
-                and test['parameters']['name']):
-                q.update(test['parameters']['name'])
+            if ('table_name' in test['parameters']
+                and test['parameters']['table_name']
+                and test['parameters']['table_name']):
+                q.update(test['parameters']['table_name'])
             else:
                 q.update(None)
 
