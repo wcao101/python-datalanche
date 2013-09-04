@@ -234,7 +234,7 @@ class DLClient(object):
                 data = json.dumps(get_body(q)),
                 verify = self.verify_ssl
                 )
-            print "debug info: :  ", get_debug_info(q.url_type, self.client, r), "\n"
+            print "debug info:   ", get_debug_info(q.url_type, self.client, r), "\n"
 
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), r.url)

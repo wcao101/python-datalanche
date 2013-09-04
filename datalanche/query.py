@@ -233,9 +233,6 @@ class DLQuery(object):
         return self
 
     def where(self, expression = None):
-        print "the type of e is: ", type(expression)
-        d = DLExpression()
-        print "the type of d is: ", type(d)
 
         if(isinstance(expression, type(d))):
             self.params['where'] = expression.json()

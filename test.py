@@ -179,7 +179,7 @@ def query_raw(url_type,base_url,body):
         return r.json(object_pairs_hook=collections.OrderedDict)
 
     if (url_type == 'post'):
-        print "In the test.py use_query, the body['where'] is: ******* ", body
+
         r = client.client.post ( 
             url,
             headers ={'Content-type':'application/json'},
@@ -233,7 +233,7 @@ def alter_table(test):
         else:
             if ('table_name' in test['parameters']
                 and test['parameters']['table_name'] != 'null'
-                and test['parameters']['table_name'] != ''):
+            ):
                 q.alter_table(test['parameters']['table_name'])
             else:
                 q.alter_table(None)
@@ -307,7 +307,7 @@ def create_table(test):
              
             if('table_name' in test['parameters'] 
                and test['parameters']['table_name'] != 'null'
-               and test['parameters']['table_name'] != ''):
+            ):
                 q.create_table(test['parameters']['table_name'])
             else:
                 q.create_table(None)
@@ -351,7 +351,7 @@ def drop_table(test):
         else:
             if ('table_name' in test['parameters']
                 and  test['parameters']['table_name'] != 'null'
-                ):
+            ):
                 q.drop_table(test['parameters']['table_name'])
                 
             else:
@@ -387,7 +387,7 @@ def delete_from(test):
         else:
             if ('table_name' in test['parameters']
                 and test['parameters']['table_name'] != 'null'
-                and test['parameters']['table_name'] != ''):
+            ):
                 q.delete_from(test['parameters']['table_name'])
             else:
                 q.delete_from(None)
@@ -411,7 +411,7 @@ def get_table_list(test):
     keys = list()
     
     try:
-        print "the key is: ", test['parameters']['key']," and the secret is: ",test['parameters']['secret']
+
         client.key(test['parameters']['key'])
         client.secret(test['parameters']['secret'])
         del test['parameters']['key']
@@ -421,7 +421,7 @@ def get_table_list(test):
                 
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
-            print "The params is using raw_query..\n"
+
             data = query_raw('get','/get_table_list',test['parameters'])
                  
             if (test['expected']['statusCode'] == 200):
@@ -448,9 +448,9 @@ def get_table_list(test):
                             tables.append(table)
                             break
                             
-            data = collections.OrderedDict()
-            data['num_tables'] = len(tables)
-            data['tables'] = tables
+                data = collections.OrderedDict()
+                data['num_tables'] = len(tables)
+                data['tables'] = tables
             
             success = handle_test(data, test)
         
@@ -488,9 +488,9 @@ def get_table_list(test):
                             tables.append(table)
                             break
                         
-            data = collections.OrderedDict()
-            data['num_tables'] = len(tables)
-            data['tables'] = tables
+                data = collections.OrderedDict()
+                data['num_tables'] = len(tables)
+                data['tables'] = tables
             
             success = handle_test(data, test)
 
@@ -528,7 +528,7 @@ def get_table_info(test):
         else:
             if ('table_name' in test['parameters']
                 and test['parameters']['table_name'] != 'null'
-                and test['parameters']['table_name'] != ''):
+            ):
                 q.get_table_info(test['parameters']['table_name'])
             else:
                 q.get_table_info(None)
@@ -549,12 +549,11 @@ def get_table_info(test):
         pass
     return success
 
-def insert_into(test):
+def insert_into(test,dataset_file_path):
     success = False
     q = DLQuery()
 
     keys = ['table_name','values']
-    data = None
 
     try:
         client.key(test['parameters']['key'])
@@ -565,24 +564,26 @@ def insert_into(test):
         use_raw = use_raw_query(keys, test['parameters'])
         if (use_raw == True):
             data = query_raw('post', '/insert_into', test['parameters'])
-            
+            success = handle_test(data, test)
+
         else:
             if ('table_name' in test['parameters']
                 and test['parameters']['table_name'] != 'null'
-                and test['parameters']['table_name'] != ''):
+            ):
                 q.insert_into(test['parameters']['table_name'])
             else:
                 q.insert_into(None)
                 
             if test['parameters']['values'] == 'dataset_file':
-                records = get_records_from_file(filename)
+                records = get_records_from_file(dataset_file_path)
                 q.values(records)
                 data = client.quer(q)
             else:
+
                 q.values(test['parameters']['values'])
                 data = client.query(q)
 
-        success = handle_test(data, test)
+            success = handle_test(data, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -616,14 +617,13 @@ def select_from(test):
         
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
-            print "select *** using the raw_query *** ..."
+
             data = query_raw('post', '/select_from',test['parameters'])
-            print "\n and the data is: ", data, "\n"
             
             success = handle_test(data, test)
                         
         else:
-            print "select *** using the query ****..."
+
             if('from' in test['parameters']
                and test['parameters']['from'] != 'null'
             ):
@@ -649,7 +649,7 @@ def select_from(test):
                 q.total(test['parameters']['total'])
             
             data = client.query(q)
-            print " \n and the data is: ", data
+
             success = handle_test(data, test)
 
     except DLException as e:
@@ -679,8 +679,8 @@ def update(test):
         else:
 
             if ('table_name' in test['parameters']
-                and test['parameters']['table_name']
-                and test['parameters']['table_name']):
+                and test['parameters']['table_name'] != 'null'
+            ):
                 q.update(test['parameters']['table_name'])
             else:
                 q.update(None)
@@ -755,7 +755,7 @@ for filename in files:
         elif test['method'] == 'get_table_list':
             success = get_table_list(test)
         elif test['method'] == 'insert_into':
-            success = insert_into(test)
+            success = insert_into(test, dataset_file)
         elif test['method'] == 'select_from':
             success = select_from(test)
         elif test['method'] == 'update':
