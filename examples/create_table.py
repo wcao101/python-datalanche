@@ -11,7 +11,7 @@ try:
     # and the server will set defaults.
     
     q = DLQuery()
-    q.create_table('my_table')
+    q.create_table('my_table_oop1')
     q.description('my_table description text')
     q.is_private(True)
     q.license({
@@ -49,8 +49,8 @@ try:
         }
     ])
     
-    client.query(q)
-    print "table has been succefully created!"
+    data = client.query(q)
+    print "table has been succefully created!", data
 except DLException as e:
     print repr(e)
     

@@ -10,11 +10,11 @@ try:
     )
     
     q = DLQuery()
-    q.drop_table('my_table_two')
+    q.drop_table('my_table_oop1')
     
-    client.query(q)
+    data = client.query(q)
     
-    print "table has been dropped/deleted\n"
+    print "table has been dropped/deleted\n", data
     
 except DLException as e:
     print repr(e)

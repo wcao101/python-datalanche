@@ -20,7 +20,7 @@ try:
     q.delete_from('my_table')
     q.where(e)
 
-    client.query(q)
-    print "row has been successfully deleted!\n"
+    data = client.query(q)
+    print "row has been successfully deleted!\n", data
 except DLException as e:
     print repr(e)

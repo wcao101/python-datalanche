@@ -270,7 +270,7 @@ def alter_table(test):
 
 
         data = client.query(q)
-        success = handle_test(data, test)
+        success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -324,7 +324,7 @@ def create_table(test):
                 
             data = client.query(q)
 
-        success = handle_test(data, test)
+        success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -359,7 +359,7 @@ def drop_table(test):
             
             data = client.query(q)
                 
-        success = handle_test(data, test)
+        success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -397,7 +397,7 @@ def delete_from(test):
            
             data = client.query(q)
             
-        success = handle_test(data, test)
+        success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -465,8 +465,8 @@ def get_table_list(test):
 
             if (test['expected']['statusCode'] == 200):
 
-                for i in range(0, data['num_tables']):
-                    table = data['tables'][i]
+                for i in range(0, data['data']['num_tables']):
+                    table = data['data']['tables'][i]
                     
                     # too variable to test
                     try:
@@ -538,10 +538,10 @@ def get_table_info(test):
             # Delete date/time properties since they are probably
             # different than the test data. This is okay because
             # the server sets these values on write operations.
-            del data['when_created']
-            del data['last_updated']
+            del data['data']['when_created']
+            del data['data']['last_updated']
 
-            success = handle_test(data, test)
+            success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -583,7 +583,7 @@ def insert_into(test,dataset_file_path):
                 q.values(test['parameters']['values'])
                 data = client.query(q)
 
-            success = handle_test(data, test)
+            success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -650,7 +650,7 @@ def select_from(test):
             
             data = client.query(q)
 
-            success = handle_test(data, test)
+            success = handle_test(data['data'], test)
 
     except DLException as e:
         success = handle_exception(e, test)
@@ -692,7 +692,7 @@ def update(test):
 
             data = client.query(q)
 
-        success = handle_test(data, test)
+        success = handle_test(data['data'], test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:

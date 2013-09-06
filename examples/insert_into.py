@@ -31,7 +31,7 @@ try:
     ])
     
     client.query(q)
-    print "rows inserted into my_table"
+    print "rows inserted into my_table."
     
 except DLException as e:
     print repr(e)

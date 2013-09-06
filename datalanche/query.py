@@ -233,7 +233,7 @@ class DLQuery(object):
         return self
 
     def where(self, expression = None):
-
+        d = DLExpression()
         if(isinstance(expression, type(d))):
             self.params['where'] = expression.json()
         else:

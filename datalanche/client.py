@@ -170,21 +170,28 @@ def get_url(query = None):
     #printnt "the url and the query_str is: ", url
     return url
 
-def get_debug_info(method, req, res):
-    info_obj = {}
-    info_obj ['request'] = {}
-    info_obj ['response'] = {}
+def get_debug_info(r,base_url):
+   
+    info_obj = collections.OrderedDict()
+    info_obj ['request']= collections.OrderedDict()
+    info_obj ['response'] = collections.OrderedDict()
+    info_obj ['data'] = {}
+    
+    info_obj ['request']['method'] = r.request.method
+    info_obj ['request']['url'] = r.request.url
+    info_obj ['request']['headers'] = r.request.headers
+    info_obj ['request']['body'] = r.request.body
+    
+    info_obj ['response']['http_status'] = r.status_code
+    info_obj ['response']['headers'] = r.headers
 
-    info_obj ['request']['method'] = method
-    info_obj ['request']['url'] = req.url
-    info_obj ['request']['headers'] = res.headers
-    if(req['body'] != 'null'):
-        info_obj ['request']['body'] = req.data
-    info_obj ['request']['body'] = None
-
-    info_obj ['response']['http_status'] = res.status_code
-    info_obj ['response']['http_version'] = res.http_version
-    info_obj ['response']['headers'] = res.headers
+    if (r.request.method == 'POST' or r.request.method == 'DELETE'):
+        if (base_url == '/select_from'):
+            info_obj ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+        else:
+            pass
+    else:
+        info_obj ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
 
     return info_obj
 
@@ -202,7 +209,7 @@ class DLClient(object):
             self.url = 'https://' + host
         if port != None:
             self.url = self.url + ':' + str(port)
-
+            
     def key (self, key = None):
         self.auth_key = key
         
@@ -219,14 +226,24 @@ class DLClient(object):
             r = self.client.delete(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-                headers ={'Content-type':'application/json'},
+                headers = {'Content-type':'application/json'},
                 verify = self.verify_ssl
             )
+            
+            result = {}
+            debug_info = get_debug_info(r,q.base_url)
+            
+            result['response'] = debug_info['response']
+            result['request'] = debug_info['request']
+        
+            
             if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), r.url)
-            #print "debug info: ", get_debug_info(q, r)
+                raise DLException(r.status_code, r.json(), debug_info)
+                        
+            return result
                         
         elif (q.url_type == 'post'):
+
             r = self.client.post(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
@@ -234,28 +251,42 @@ class DLClient(object):
                 data = json.dumps(get_body(q)),
                 verify = self.verify_ssl
                 )
-            print "debug info: :  ", get_debug_info(q.url_type, self.client, r), "\n"
 
-            if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), r.url)
-            
+            result = {}
+            debug_info = get_debug_info(r,q.base_url)
             if (q.base_url == '/select_from'):
-                return r.json(object_pairs_hook=collections.OrderedDict)
+                result['data'] = r.json(object_pairs_hook=collections.OrderedDict)
             
+            result['response'] = debug_info['response']
+            result['request'] = debug_info['request']
             
+            if not 200 <= r.status_code < 300:
+                raise DLException(r.status_code, r.json(), debug_info)
+          
+            return result
+                        
                             
         elif (q.url_type == 'get'):
+
             r = self.client.get(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
                 headers ={'Content-type':'application/json'},
                 verify = self.verify_ssl
             )
+            
+            debug_info = get_debug_info(r,q.base_url)
+            result = {}
+
+            result['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+            result['response'] = debug_info['response']
+            result['request'] = debug_info['request']
+
+            
             if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), r.url)
-                
-            #print "debug info: ", get_debug_info(q, r)
-            return r.json(object_pairs_hook=collections.OrderedDict)
+                raise DLException(r.status_code, r.json(), debug_info)
+           
+            return result
                 
         else:
             print "Error: unsupported query type"
