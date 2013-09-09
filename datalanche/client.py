@@ -163,11 +163,7 @@ def get_url(query = None):
     query_str = urllib.urlencode(parameters)
    
     if (query_str != ''):
-        print "the query_str is: ", query_str
-        print "\n"
         url += '?' + query_str
-    
-    #printnt "the url and the query_str is: ", url
     return url
 
 def get_debug_info(r,base_url):

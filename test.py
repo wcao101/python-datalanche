@@ -72,24 +72,23 @@ def get_records_from_file(filename):
 
 def handle_test(data, test):
     result = 'FAIL'
-
+    
     if data == test['expected']['data']:
         result = 'PASS'
-    
-    if result == 'FAIL':
-        print "\n"
-        print "Testing handle_test( ", test['name']," ) ..."
-        print json.dumps({
-            'name': test['name'],
-            'expected': test['expected'],
-            'actual': {
-                'statusCode': 200,
-                'exception': '',
-                'data': data,
-            },
-            'result': result,
-        })
-        print "\n"
+            
+    print "\n"
+    print "Testing handle_test( ", test['name']," ) ..."
+    print json.dumps({
+        'name': test['name'],
+        'expected': test['expected'],
+        'actual': {
+            'statusCode': 200,
+            'exception': '',
+            'data': data
+        },
+        'result': result
+    })
+    print "\n"
 
     if result == 'PASS':
         return True
@@ -104,51 +103,28 @@ def handle_exception(e, test):
     ## We should be case-insenitive in this case, and match the definition in
     ## the tests.
 
-    if (message[0] == 'e' 
-        and message[1] == 'r' 
-        and message[2] == 'r'):
+    if (message[0] == 'e' and message[1] == 'r' and message[2] == 'r'):
         message =  message.replace(message[0],'E',1)
                 
-        if (e.status_code == test['expected']['statusCode']
-            and message == test['expected']['data']
-            and e.response['code'] == test['expected']['exception']):
-            result = 'PASS'
+    if (e.status_code == test['expected']['statusCode']
+        and message == test['expected']['data']
+        and e.response['code'] == test['expected']['exception']):
+        result = 'PASS'
         
-            
-        print "\n"
-        print "Testing handle_exception( ", test['name']," ) ..."
-        print json.dumps({
-            'name': test['name'],
+    print "\n"
+    print "Testing handle_exception( ", test['name']," ) ..."
+    print json.dumps({
+        'name': test['name'],
             'expected': test['expected'],
-            'actual': {
-                'statusCode': e.status_code,
-                    'exception': e.response['code'],
-                'data': message,
-            },
-            'result': result,
-        })
-        print "\n"
-        
-    else:
-        if (e.status_code == test['expected']['statusCode']
-            and e.response['message'] == test['expected']['data']
-            and e.response['code'] == test['expected']['exception']):
-            result = 'PASS'
-            
-        print "\n"
-        print "Testing handle_exception( ", test['name']," ) ..."
-        print json.dumps({
-            'name': test['name'],
-            'expected': test['expected'],
-            'actual': {
-                'statusCode': e.status_code,
-                'exception': e.response['code'],
-                'data': e.response['message'],
-            },
-            'result': result,
-        })
-        print "\n"
-        
+        'actual': {
+            'statusCode': e.status_code,
+            'exception': e.response['code'],
+            'data': message
+        },
+        'result': result
+    })
+    print "\n"
+    
     if result == 'PASS':
         return True
     return False
@@ -302,7 +278,8 @@ def create_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('post','/create_table',test['parameters'])
-                            
+            success = handle_test(data, test)
+
         else:
              
             if('table_name' in test['parameters'] 
@@ -324,9 +301,11 @@ def create_table(test):
                 
             data = client.query(q)
 
-        success = handle_test(data['data'], test)
+            success = handle_test(data['data'], test)
+        #print "the debug info for handle test for creating table: ",data,"\n"
     except DLException as e:
         success = handle_exception(e, test)
+        print "the debug info for handle EXCEPTION for creating table: ", e.info,"\n"
     except Exception as e:
         #print repr(e)
         pass
@@ -347,7 +326,8 @@ def drop_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('del','/drop_table',test['parameters'])
-        
+            success = handle_test(data, test)
+
         else:
             if ('table_name' in test['parameters']
                 and  test['parameters']['table_name'] != 'null'
@@ -359,9 +339,11 @@ def drop_table(test):
             
             data = client.query(q)
                 
-        success = handle_test(data['data'], test)
+            success = handle_test(data['data'], test)
+        #print "the debug info for handle test for droping table: ", data,"\n"
     except DLException as e:
         success = handle_exception(e, test)
+        #print "the debug info for handle EXCEPTION for droping table: ", e.info,"\n"
     except Exception as e:
         #print repr(e)
         pass
@@ -409,23 +391,22 @@ def get_table_list(test):
     success = False
     q = DLQuery()
     keys = list()
-    
-    try:
-
-        client.key(test['parameters']['key'])
-        client.secret(test['parameters']['secret'])
-        del test['parameters']['key']
-        del test['parameters']['secret']
         
-        tables = list()
-                
-        use_raw = use_raw_query(keys,test['parameters'])
-        if (use_raw == True):
-
-            data = query_raw('get','/get_table_list',test['parameters'])
-                 
-            if (test['expected']['statusCode'] == 200):
+        
+    tables = list()
+    
+    use_raw = use_raw_query(keys,test['parameters'])
+    if (use_raw == True):
+        try:
+            client.key(test['parameters']['key'])
+            client.secret(test['parameters']['secret'])
+            del test['parameters']['key']
+            del test['parameters']['secret']
                    
+            data = query_raw('get','/get_table_list',test['parameters'])
+                    
+            if (test['expected']['statusCode'] == 200):
+                
                 for i in range(0, data['num_tables']):
                     table = data['tables'][i]
                     
@@ -434,6 +415,59 @@ def get_table_list(test):
                     except Exception as e:
                         # ignore error
                         #print repr(e)
+                        pass
+                
+                    try:
+                        del table['when_created']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                        
+                    for j in range(0, test['expected']['data']['num_tables']):
+                        if table == test['expected']['data']['tables'][j]:
+                            tables.append(table)
+                            break
+                            
+                data = collections.OrderedDict()
+                data['num_tables'] = len(tables)
+                data['tables'] = tables
+                
+                success = handle_test(data, test)
+                        
+        except DLException as e:
+            success = handle_exception(e, test)
+        except Exception as e:
+            # print repr(e)
+            pass
+            
+    # getDatasetList() test is a bit different than the rest
+    # because a server can have any number of datasets. We test
+    # that the expected dataset(s) is listed rather than
+    # checking the entire result is valid, but only if a valid
+    # response is expected.
+    else:
+        try:
+            client.key(test['parameters']['key'])
+            client.secret(test['parameters']['secret'])
+            del test['parameters']['key']
+            del test['parameters']['secret']
+
+            q.get_table_list()
+            data = client.query(q)
+            
+            
+            if (test['expected']['statusCode'] == 200):
+                
+                for i in range(0, data['data']['num_tables']):
+                    table = data['data']['tables'][i]
+                    
+                    # too variable to test
+                    try:
+                        del table['last_updated']
+                    except Exception as e:
+                        # ignore error
+                    #print repr(e)
                         pass
                         
                     try:
@@ -451,54 +485,14 @@ def get_table_list(test):
                 data = collections.OrderedDict()
                 data['num_tables'] = len(tables)
                 data['tables'] = tables
-            
-            success = handle_test(data, test)
-        
-        # getDatasetList() test is a bit different than the rest
-        # because a server can have any number of datasets. We test
-        # that the expected dataset(s) is listed rather than
-        # checking the entire result is valid, but only if a valid
-        # response is expected.
-        else:
-            q.get_table_list()
-            data = client.query(q)
-
-            if (test['expected']['statusCode'] == 200):
-
-                for i in range(0, data['data']['num_tables']):
-                    table = data['data']['tables'][i]
-                    
-                    # too variable to test
-                    try:
-                        del table['last_updated']
-                    except Exception as e:
-                        # ignore error
-                        #print repr(e)
-                        pass
-                        
-                    try:
-                        del table['when_created']
-                    except Exception as e:
-                        # ignore error
-                        #print repr(e)
-                        pass
-                        
-                    for j in range(0, test['expected']['data']['num_tables']):
-                        if table == test['expected']['data']['tables'][j]:
-                            tables.append(table)
-                            break
-                        
-                data = collections.OrderedDict()
-                data['num_tables'] = len(tables)
-                data['tables'] = tables
-            
-            success = handle_test(data, test)
-
-    except DLException as e:
-        success = handle_exception(e, test)
-    except Exception as e:
-        # print repr(e)
-        pass
+                
+                success = handle_test(data, test)
+                
+        except DLException as e:
+            success = handle_exception(e, test)
+        except Exception as e:
+            # print repr(e)
+            pass
     return success
 
 def get_table_info(test):
@@ -564,6 +558,7 @@ def insert_into(test,dataset_file_path):
         use_raw = use_raw_query(keys, test['parameters'])
         if (use_raw == True):
             data = query_raw('post', '/insert_into', test['parameters'])
+            print "for using raw query insert_table, data is: ",data,"\n"
             success = handle_test(data, test)
 
         else:
@@ -584,8 +579,14 @@ def insert_into(test,dataset_file_path):
                 data = client.query(q)
 
             success = handle_test(data['data'], test)
+            print "Performing handle_test ",test['name'],"\n"
+            print "the debug info is: ",data['request'],data['response'],data['data'],"\n"
+
     except DLException as e:
         success = handle_exception(e, test)
+        print "Performing handle_DLException test ",test['name'],"\n"
+        print "the debug info is: ",e.info,"\n"
+
     except Exception as e:
         #print repr(e)
         pass
@@ -765,7 +766,10 @@ for filename in files:
             print 'ERROR: ' + test['method'] + ' method not found'
 
         if success == True:
+            print "This is the passed test: ", test['name']
             num_passed = num_passed + 1
+        else:
+            print "The failure is in: ", test['name']
 
 print '\n-------------------------------'
 print 'passed: ' + str(num_passed)
