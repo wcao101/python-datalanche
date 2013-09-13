@@ -18,116 +18,8 @@ def get_body(query = None):
     
     if(query == None):
         return body
-        
-    if(query.params['debug'] != None):
-        body['debug'] = query.params['debug']
-        
-    if(query.base_url == '/alter_table'):
-        
-        if(query.params['add_columns'] != None):
-            body['add_columns'] = query.params['add_columns']
-            
-        if(query.params['alter_columns'] != None):
-            body['alter_columns'] = query.params['alter_columns']
-        
-        if(query.params['table_name'] != None):
-            body['table_name'] = query.params['table_name']
-            
-        if(query.params['description'] != None):
-            body['description'] = query.params['description']
-        
-        if(query.params['drop_columns'] != None):
-            body['drop_columns'] = query.params['drop_columns']
-            
-        if(query.params['is_private'] != None):
-            body['is_private'] = query.params['is_private']
-            
-        if(query.params['license'] != None):
-            body['license'] = query.params['license']
-            
-        if(query.params['rename'] != None):
-            body['rename'] = query.params['rename']
-            
-        if(query.params['sources'] != None):
-            body['sources'] = query.params['sources']
-        
-    elif(query.base_url == '/create_table'):
-        
-        if (query.params['columns'] != None):
-            body['columns'] = query.params['columns']
-        
-        if (query.params['table_name'] != None):
-            body['table_name'] = query.params['table_name']
-        
-        if (query.params['description'] != None):
-            body['description'] = query.params['description']
-                
-        if (query.params['is_private'] != None):
-            body['is_private'] = query.params['is_private']
-        
-        if (query.params['license'] != None):
-            body['license'] = query.params['license']
-        
-        if (query.params['sources'] != None):
-            body['sources'] = query.params['sources']
-            
-    elif (query.base_url == '/delete_from'):
 
-        if (query.params['table_name'] != None):
-            body['table_name'] = query.params['table_name']
-        
-        if (query.params['where'] != None): 
-            body['where'] = query.params['where']
-        
-    elif (query.base_url == '/insert_into'):
-
-        if (query.params['table_name'] != None):
-            body['table_name'] = query.params['table_name']
-                    
-        if (query.params['values'] != None):
-            body['values'] = query.params['values']
-        
-    elif (query.base_url == '/select_from'):
-            
-        if (query.params['distinct'] != None):
-            body['distinct'] = query.params['distinct']
-        
-        if (query.params['from_table'] != None):
-            body['from'] = query.params['from_table']
-        
-        if (query.params['group_by'] != None):
-            body['group_by'] = query.params['group_by']
-        
-        if (query.params['limit'] != None):
-            body['limit'] = query.params['limit']
-        
-        if (query.params['offset'] != None):
-            body['offset'] = query.params['offset']
-        
-        if (query.params['order_by'] != None):
-            body['order_by'] = query.params['order_by']
-        
-        if (query.params['select'] != None):
-                body['select'] = query.params['select']
-        
-        if (query.params['total'] != None):
-            body['total'] = query.params['total']
-            
-        if (query.params['where'] != None):
-            body['where'] = query.params['where']
-                       
-    elif (query.base_url == '/update'):
-
-        if (query.params['table_name'] != None):
-            body['table_name'] = query.params['table_name']
-        
-        if (query.params['set'] != None):
-            body['set'] = query.params['set']
-                                
-        if (query.params['where'] != None):
-            body['where'] = query.params['where']
-           
-    return body
+    return query.params
         
    
 # For POST, all parameters are in the body so that they are also encrypted.
@@ -140,10 +32,6 @@ def get_url(query = None):
     
     url = query.base_url
     parameters = OrderedDict()
-
-    
-    if (query.params['debug'] != None):
-        parameters['debug'] = query.params['debug']
     
     if (url == '/drop_table'):
 
@@ -166,30 +54,6 @@ def get_url(query = None):
         url += '?' + query_str
     return url
 
-def get_debug_info(r,base_url):
-   
-    info_obj = collections.OrderedDict()
-    info_obj ['request']= collections.OrderedDict()
-    info_obj ['response'] = collections.OrderedDict()
-    info_obj ['data'] = {}
-    
-    info_obj ['request']['method'] = r.request.method
-    info_obj ['request']['url'] = r.request.url
-    info_obj ['request']['headers'] = r.request.headers
-    info_obj ['request']['body'] = r.request.body
-    
-    info_obj ['response']['http_status'] = r.status_code
-    info_obj ['response']['headers'] = r.headers
-
-    if (r.request.method == 'POST' or r.request.method == 'DELETE'):
-        if (base_url == '/select_from'):
-            info_obj ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
-        else:
-            pass
-    else:
-        info_obj ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
-
-    return info_obj
 
 class DLClient(object):
     def __init__(
@@ -211,6 +75,23 @@ class DLClient(object):
         
     def secret (self, secret = None):
         self.auth_secret = secret
+
+    def get_debug_info(self,r):
+        
+        info_obj = collections.OrderedDict()
+        info_obj ['request']= collections.OrderedDict()
+        info_obj ['response'] = collections.OrderedDict()
+        
+        info_obj ['request']['method'] = r.request.method
+        info_obj ['request']['url'] = r.request.url
+        info_obj ['request']['headers'] = r.request.headers
+        info_obj ['request']['body'] = r.request.body
+    
+        info_obj ['response']['http_status'] = r.status_code
+        info_obj ['response']['headers'] = r.headers
+        
+        return info_obj
+
         
     def query(self,q = None):
         
@@ -227,7 +108,7 @@ class DLClient(object):
             )
             
             result = {}
-            debug_info = get_debug_info(r,q.base_url)
+            debug_info = self.get_debug_info(r)
             
             result['response'] = debug_info['response']
             result['request'] = debug_info['request']
@@ -249,10 +130,9 @@ class DLClient(object):
                 )
 
             result = {}
-            debug_info = get_debug_info(r,q.base_url)
+            debug_info = self.get_debug_info(r)
             if (q.base_url == '/select_from'):
-                result['data'] = r.json(object_pairs_hook=collections.OrderedDict)
-            
+                result['data'] = r.json(object_pairs_hook=collections.OrderedDict)            
             result['response'] = debug_info['response']
             result['request'] = debug_info['request']
             
@@ -271,7 +151,7 @@ class DLClient(object):
                 verify = self.verify_ssl
             )
             
-            debug_info = get_debug_info(r,q.base_url)
+            debug_info = self.get_debug_info(r)
             result = {}
 
             result['data'] = r.json(object_pairs_hook=collections.OrderedDict)

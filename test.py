@@ -130,12 +130,17 @@ def handle_exception(e, test):
     return False
     
 def use_raw_query(keys,params):
-    use_raw = False
+
     for k in params.keys():
         if(k not in keys):
-            use_raw = True
+            return True
+
+    if('table_name' in params):
+        return False
+    if('from' in params):
+        return False
     
-    return use_raw
+    return True
 
 # For testing unkown parameters. The API prevents users from adding
 # unknown parameters so we need to circumvent it.
@@ -150,8 +155,9 @@ def query_raw(url_type,base_url,body):
             headers ={'Content-type':'application/json'},
             verify = client.verify_ssl    
         )
+        debug_info = client.get_debug_info(r)
         if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+            raise DLException(r.status_code, r.json(), debug_info)
         return r.json(object_pairs_hook=collections.OrderedDict)
 
     if (url_type == 'post'):
@@ -162,8 +168,9 @@ def query_raw(url_type,base_url,body):
             data = json.dumps(body),
             verify = client.verify_ssl
         )
+        debug_info = client.get_debug_info(r)
         if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+            raise DLException(r.status_code, r.json(), debug_info)
         return r.json(object_pairs_hook=collections.OrderedDict)
                 
     if (url_type == 'get'):
@@ -173,8 +180,9 @@ def query_raw(url_type,base_url,body):
             data = json.dumps(body),
             verify = client.verify_ssl
         )
+        debug_info = client.get_debug_info(r)
         if not 200 <= r.status_code < 300:
-            raise DLException(r.status_code, r.json(), r.url)
+            raise DLException(r.status_code, r.json(), debug_info)
         return r.json(object_pairs_hook=collections.OrderedDict)
 
 def alter_table(test):
@@ -204,7 +212,7 @@ def alter_table(test):
         
         use_raw = use_raw_query(keys,test['parameters'])
         if(use_raw == True):
-                query_raw('post','/alter_table',test['parameters'])
+            query_raw('post','/alter_table',test['parameters'])
         
         else:
             if ('table_name' in test['parameters']
@@ -282,12 +290,8 @@ def create_table(test):
 
         else:
              
-            if('table_name' in test['parameters'] 
-               and test['parameters']['table_name'] != 'null'
-            ):
+            if('table_name' in test['parameters']):
                 q.create_table(test['parameters']['table_name'])
-            else:
-                q.create_table(None)
             if('description' in test['parameters']):
                 q.description(test['parameters']['description'])
             if('is_private' in test['parameters']):
@@ -300,14 +304,13 @@ def create_table(test):
                 q.columns(test['parameters']['columns'])
                 
             data = client.query(q)
-
-            success = handle_test(data['data'], test)
-        #print "the debug info for handle test for creating table: ",data,"\n"
+            print "the debug info for creating the table is: ",data['request'],data['response'],"\n"
+            success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
-        print "the debug info for handle EXCEPTION for creating table: ", e.info,"\n"
+        print "the debug info for creating the table is: ",e.info,"\n"
     except Exception as e:
-        #print repr(e)
+        print repr(e)
         pass
     return success
 
@@ -326,20 +329,15 @@ def drop_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('del','/drop_table',test['parameters'])
-            success = handle_test(data, test)
+            success = handle_test(None, test)
 
         else:
-            if ('table_name' in test['parameters']
-                and  test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.drop_table(test['parameters']['table_name'])
-                
-            else:
-                q.drop_table(None)
             
             data = client.query(q)
                 
-            success = handle_test(data['data'], test)
+            success = handle_test(None, test)
         #print "the debug info for handle test for droping table: ", data,"\n"
     except DLException as e:
         success = handle_exception(e, test)
@@ -701,21 +699,27 @@ def update(test):
         pass
     return success
 
-q = DLQuery()
-
-try:
-    client.query(q.drop_table('test_dataset'))
-except Exception as e:
-    # print repr(e)
-    # ignore error
-
+def restore():
+    q = DLQuery()
+    
     try:
-        client.query(q.drop_table('new_test_dataset'))
+        client.key(valid_key)
+        client.secret(valid_secret)
+        client.query(q.drop_table('test_dataset'))
     except Exception as e:
-        pass
-        # print repr(e)
+        #print repr(e)
         # ignore error
+        pass
+        
+        try:
+            client.query(q.drop_table('new_test_dataset'))
+        except Exception as e:
+            pass
+            #print repr(e)
+            # ignore error
 
+# to remove all the 'old' datasets from the previous test.
+server = restore()
 # after the new_test_dataset is loaded...
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)

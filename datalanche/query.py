@@ -13,31 +13,8 @@ class DLQuery(object):
     def __init__(self):
         self.url_type = 'get'
         self.base_url = '/'
-        self.params = {
-            'add_columns' : None,
-            'alter_columns' : None,
-            'columns' : None,
-            'debug' : None,
-            'description' : None,
-            'distinct' : None,
-            'drop_columns' : None,
-            'from' : None,
-            'group_by' : None,
-            'is_private' : None,
-            'license' : None,
-            'limit' : None,
-            'offset' : None,
-            'order_by' : None,
-            'table_name' : None,
-            'rename' : None,
-            'select' : None,
-            'set' : None,
-            'sources' : None,
-            'total' : None,
-            'values' : None,
-            'where' : None,
-        }
-        
+        self.params = {}
+                   
     def add_column(self,columns):
         
         if self.params['add_columns'] == None:
@@ -76,12 +53,6 @@ class DLQuery(object):
         self.base_url = '/create_table'
         self.params['table_name'] = table_name
         
-        return self
-
-    def debug(self,bool_type = None):
-        
-        self.params['debug'] = bool_type
-
         return self
 
     def delete_from(self,table_name):
