@@ -304,11 +304,11 @@ def create_table(test):
                 q.columns(test['parameters']['columns'])
                 
             data = client.query(q)
-            print "the debug info for creating the table is: ",data['request'],data['response'],"\n"
+            print "debug info for CREATING table ",data['request'],data['response'],"\n"
             success = handle_test(None, test)
     except DLException as e:
+        print "debug info for CREATING table ",e.info,"\n"
         success = handle_exception(e, test)
-        print "the debug info for creating the table is: ",e.info,"\n"
     except Exception as e:
         print repr(e)
         pass
@@ -336,12 +336,11 @@ def drop_table(test):
                 q.drop_table(test['parameters']['table_name'])
             
             data = client.query(q)
-                
+            print "\n the debug info for DROPING the table is: ",data['request'],data['response'],"\n"
             success = handle_test(None, test)
-        #print "the debug info for handle test for droping table: ", data,"\n"
     except DLException as e:
         success = handle_exception(e, test)
-        #print "the debug info for handle EXCEPTION for droping table: ", e.info,"\n"
+        print "the debug info for handle EXCEPTION for droping table: ", e.info,"\n"
     except Exception as e:
         #print repr(e)
         pass
@@ -557,16 +556,11 @@ def insert_into(test,dataset_file_path):
         if (use_raw == True):
             data = query_raw('post', '/insert_into', test['parameters'])
             print "for using raw query insert_table, data is: ",data,"\n"
-            success = handle_test(data, test)
+            success = handle_test(None, test)
 
         else:
-            if ('table_name' in test['parameters']
-                and test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.insert_into(test['parameters']['table_name'])
-            else:
-                q.insert_into(None)
-                
             if test['parameters']['values'] == 'dataset_file':
                 records = get_records_from_file(dataset_file_path)
                 q.values(records)
@@ -576,7 +570,7 @@ def insert_into(test,dataset_file_path):
                 q.values(test['parameters']['values'])
                 data = client.query(q)
 
-            success = handle_test(data['data'], test)
+            success = handle_test(None, test)
             print "Performing handle_test ",test['name'],"\n"
             print "the debug info is: ",data['request'],data['response'],data['data'],"\n"
 
@@ -623,13 +617,8 @@ def select_from(test):
                         
         else:
 
-            if('from' in test['parameters']
-               and test['parameters']['from'] != 'null'
-            ):
+            if('from' in test['parameters']):
                 q.from_table(test['parameters']['from'])
-            else:
-                q.from_table(None)
-            
             if ('select' in test['parameters']):
                 q.select(test['parameters']['select'])
             if ('distinct' in test['parameters']):
@@ -648,10 +637,10 @@ def select_from(test):
                 q.total(test['parameters']['total'])
             
             data = client.query(q)
-
             success = handle_test(data['data'], test)
-
+            print "the debug info for SELECT_FROM  is: ",data['request'],data['response'],data['data'],"\n"
     except DLException as e:
+        print "the debug info for EXCEPTION SELECT_FROM is: ",e.info,"\n"
         success = handle_exception(e, test)
     except Exception as e:
         #print repr(e)
@@ -724,7 +713,7 @@ server = restore()
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)
 dataset_file = root_dir + '/' + test_suites['dataset_file']
-files = test_suites['suites']['all']
+files = test_suites['suites']['tests']
 
 for filename in files:
 
