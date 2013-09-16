@@ -17,8 +17,7 @@ class DLQuery(object):
                    
     def add_column(self,columns):
         
-        if self.params['add_columns'] == None:
-            self.params['add_columns'] = []
+        self.params['add_columns'] = []
 
         self.params['add_columns'].append(columns)
 
@@ -26,8 +25,7 @@ class DLQuery(object):
     
     def alter_column(self,column_name, column_object):
         
-        if self.params['alter_columns'] == None:
-            self.params['alter_columns'] = {}
+        self.params['alter_columns'] = {}
 
         self.params['alter_columns'][column_name] = column_object
 
@@ -77,8 +75,7 @@ class DLQuery(object):
 
     def drop_column(self,column_name):
 
-        if(self.params['drop_columns'] == None):
-            self.params['drop_columns'] = []
+        self.params['drop_columns'] = []
         
         self.params['drop_columns'].append(column_name)
 

@@ -213,14 +213,12 @@ def alter_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if(use_raw == True):
             query_raw('post','/alter_table',test['parameters'])
-        
+            data = client.query(q)
+            success = handle_test(None, test)
+
         else:
-            if ('table_name' in test['parameters']
-                and test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.alter_table(test['parameters']['table_name'])
-            else:
-                q.alter_table(None)
             if('rename' in test['parameters']):
                 q.rename(test['parameters']['rename'])
             if('description' in test['parameters']):
@@ -235,8 +233,8 @@ def alter_table(test):
                 if(isinstance(test['parameters']['add_columns'],list)):
                     for i in test['parameters']['add_columns']:
                         q.add_column(i)
-                    else:
-                        q.params['add_columns'] = test['parameters']['add_columns']
+                else:
+                    q.params['add_columns'] = test['parameters']['add_columns']
             if('drop_columns' in test['parameters']):
                 if(isinstance(test['parameters']['drop_columns'],list)):
                     for i in test['parameters']['drop_columns']:
@@ -252,13 +250,14 @@ def alter_table(test):
                 else:
                     q.params['alter_columns'] = test['parameters']['alter_columns']
 
-
-        data = client.query(q)
-        success = handle_test(data['data'], test)
+            data = client.query(q)
+            success = handle_test(None, test)
+            print "\n debug info for ALTERING table ",data['request'],data['response'],"\n"
     except DLException as e:
         success = handle_exception(e, test)
+        print "\n debug info for ALTERING table for exception: ",e.info,"\n"
     except Exception as e:
-        #print repr(e)
+        print repr(e)
         pass
     return success
 
@@ -362,21 +361,17 @@ def delete_from(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('post','/delete_from',test['parameters'])
-        
+            success = handle_test(None, test)        
+
         else:
-            if ('table_name' in test['parameters']
-                and test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.delete_from(test['parameters']['table_name'])
-            else:
-                q.delete_from(None)
-            
             if('where' in test['parameters']):
                 q.where(test['parameters']['where'])
            
             data = client.query(q)
-            
-        success = handle_test(data['data'], test)
+            success = handle_test(None, test)            
+
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -517,12 +512,8 @@ def get_table_info(test):
            success = handle_test(data, test)
                       
         else:
-            if ('table_name' in test['parameters']
-                and test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.get_table_info(test['parameters']['table_name'])
-            else:
-                q.get_table_info(None)
 
             data = client.query(q)
 
@@ -558,15 +549,19 @@ def insert_into(test,dataset_file_path):
             print "for using raw query insert_table, data is: ",data,"\n"
             success = handle_test(None, test)
 
+        elif ('values' not in test['parameters']):
+            data = query_raw('post', '/insert_into', test['parameters'])
+            print "for using raw query insert_table, data is: ",data,"\n"
+            success = handle_test(None, test)
+
         else:
             if ('table_name' in test['parameters']):
                 q.insert_into(test['parameters']['table_name'])
             if test['parameters']['values'] == 'dataset_file':
                 records = get_records_from_file(dataset_file_path)
                 q.values(records)
-                data = client.quer(q)
+                data = client.query(q)
             else:
-
                 q.values(test['parameters']['values'])
                 data = client.query(q)
 
@@ -580,7 +575,7 @@ def insert_into(test,dataset_file_path):
         print "the debug info is: ",e.info,"\n"
 
     except Exception as e:
-        #print repr(e)
+        print repr(e)
         pass
     return success
 
@@ -663,16 +658,12 @@ def update(test):
         use_raw = use_raw_query(keys, test['parameters'])
         if(use_raw == True):
             data = query_raw('post', '/update', test['parameters'])
-            
+            success = handle_test(None, test)
+
         else:
 
-            if ('table_name' in test['parameters']
-                and test['parameters']['table_name'] != 'null'
-            ):
+            if ('table_name' in test['parameters']):
                 q.update(test['parameters']['table_name'])
-            else:
-                q.update(None)
-
             if('set' in test['parameters']):
                 q.set(test['parameters']['set'])
             if('where' in test['parameters']):
@@ -680,7 +671,7 @@ def update(test):
 
             data = client.query(q)
 
-        success = handle_test(data['data'], test)
+            success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
     except Exception as e:
@@ -713,7 +704,7 @@ server = restore()
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)
 dataset_file = root_dir + '/' + test_suites['dataset_file']
-files = test_suites['suites']['tests']
+files = test_suites['suites']['all']
 
 for filename in files:
 
