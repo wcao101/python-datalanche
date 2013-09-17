@@ -2,6 +2,7 @@
 
 from datalanche import *
 from requests.auth import HTTPBasicAuth
+import urllib
 import collections
 import decimal
 import csv
@@ -150,18 +151,29 @@ def query_raw(url_type,base_url,body):
     url = client.url + base_url
 
     if (url_type == 'del'):
+        
+        query_str = urllib.urlencode(body)
+        
+        if (query_str != ''):
+            url += '?' + query_str
+            
+        result = {}
         r = client.client.delete (
             url,
             headers ={'Content-type':'application/json'},
             verify = client.verify_ssl    
         )
         debug_info = client.get_debug_info(r)
+        result ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+        result ['request'] = debug_info ['request']
+        result ['response'] = debug_info ['response']
+
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), debug_info)
-        return r.json(object_pairs_hook=collections.OrderedDict)
+        return result
 
     if (url_type == 'post'):
-
+        result = {}
         r = client.client.post ( 
             url,
             headers ={'Content-type':'application/json'},
@@ -169,11 +181,22 @@ def query_raw(url_type,base_url,body):
             verify = client.verify_ssl
         )
         debug_info = client.get_debug_info(r)
+        result ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+        result ['request'] = debug_info ['request']
+        result ['response'] = debug_info ['response']
+
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), debug_info)
-        return r.json(object_pairs_hook=collections.OrderedDict)
+        return result
                 
     if (url_type == 'get'):
+        
+        query_str = urllib.urlencode(body)
+        
+        if (query_str != ''):
+            url += '?' + query_str
+        result = {}
+
         r = client.client.get (
             url,
             headers ={'Content-type':'application/json'},
@@ -181,9 +204,13 @@ def query_raw(url_type,base_url,body):
             verify = client.verify_ssl
         )
         debug_info = client.get_debug_info(r)
+        result ['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+        result ['request'] = debug_info ['request']
+        result ['response'] = debug_info ['response']
+
         if not 200 <= r.status_code < 300:
             raise DLException(r.status_code, r.json(), debug_info)
-        return r.json(object_pairs_hook=collections.OrderedDict)
+        return result
 
 def alter_table(test):
 
@@ -285,7 +312,7 @@ def create_table(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('post','/create_table',test['parameters'])
-            success = handle_test(data, test)
+            success = handle_test(None, test)
 
         else:
              
@@ -382,93 +409,40 @@ def delete_from(test):
 def get_table_list(test):
     success = False
     q = DLQuery()
-    keys = list()
-        
-        
+    keys = []
     tables = list()
     
-    use_raw = use_raw_query(keys,test['parameters'])
-    if (use_raw == True):
-        try:
-            client.key(test['parameters']['key'])
-            client.secret(test['parameters']['secret'])
-            del test['parameters']['key']
-            del test['parameters']['secret']
-                   
+    try:
+        client.key(test['parameters']['key'])
+        client.secret(test['parameters']['secret'])
+        del test['parameters']['key']
+        del test['parameters']['secret']
+        
+        use_raw = use_raw_query(keys,test['parameters'])
+        if (use_raw == True):
             data = query_raw('get','/get_table_list',test['parameters'])
+            print "\n For the get_table_list: \'",test['name'],"\' the DEBUG INFO is: "
+            print data['request'],data['response'],data['data'],"\n"
                     
-            if (test['expected']['statusCode'] == 200):
-                
-                for i in range(0, data['num_tables']):
-                    table = data['tables'][i]
-                    
-                    try:
-                        del table['last_updated']
-                    except Exception as e:
-                        # ignore error
-                        #print repr(e)
-                        pass
-                
-                    try:
-                        del table['when_created']
-                    except Exception as e:
-                        # ignore error
-                        #print repr(e)
-                        pass
-                        
-                    for j in range(0, test['expected']['data']['num_tables']):
-                        if table == test['expected']['data']['tables'][j]:
-                            tables.append(table)
-                            break
-                            
-                data = collections.OrderedDict()
-                data['num_tables'] = len(tables)
-                data['tables'] = tables
-                
-                success = handle_test(data, test)
-                        
-        except DLException as e:
-            success = handle_exception(e, test)
-        except Exception as e:
-            # print repr(e)
-            pass
-            
-    # getDatasetList() test is a bit different than the rest
-    # because a server can have any number of datasets. We test
-    # that the expected dataset(s) is listed rather than
-    # checking the entire result is valid, but only if a valid
-    # response is expected.
-    else:
-        try:
-            client.key(test['parameters']['key'])
-            client.secret(test['parameters']['secret'])
-            del test['parameters']['key']
-            del test['parameters']['secret']
-
-            q.get_table_list()
-            data = client.query(q)
-            
-            
             if (test['expected']['statusCode'] == 200):
                 
                 for i in range(0, data['data']['num_tables']):
                     table = data['data']['tables'][i]
                     
-                    # too variable to test
                     try:
                         del table['last_updated']
                     except Exception as e:
                         # ignore error
-                    #print repr(e)
+                        #print repr(e)
                         pass
-                        
+                
                     try:
                         del table['when_created']
                     except Exception as e:
                         # ignore error
                         #print repr(e)
                         pass
-                    
+                        
                     for j in range(0, test['expected']['data']['num_tables']):
                         if table == test['expected']['data']['tables'][j]:
                             tables.append(table)
@@ -477,14 +451,56 @@ def get_table_list(test):
                 data = collections.OrderedDict()
                 data['num_tables'] = len(tables)
                 data['tables'] = tables
+                print "\n using the unknown_param for \'",test['name'], "\', the data is: ",data,"\n"
+                success = handle_test(data, test)
+                        
+        # getDatasetList() test is a bit different than the rest
+        # because a server can have any number of datasets. We test
+        # that the expected dataset(s) is listed rather than
+        # checking the entire result is valid, but only if a valid
+        # response is expected.
+        else:
+            q.get_table_list()
+            data = client.query(q)
+            
+            if (test['expected']['statusCode'] == 200):
+            
+                for i in range(0, data['data']['num_tables']):
+                    table = data['data']['tables'][i]
+                    
+                    # too many variable to test
+                    try:
+                        del table['last_updated']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                    
+                    try:
+                        del table['when_created']
+                    except Exception as e:
+                        # ignore error
+                        #print repr(e)
+                        pass
+                        
+                    for j in range(0, test['expected']['data']['num_tables']):
+                        if table == test['expected']['data']['tables'][j]:
+                            tables.append(table)
+                            break
+                
+                data = collections.OrderedDict()
+                data['num_tables'] = len(tables)
+                data['tables'] = tables
                 
                 success = handle_test(data, test)
                 
-        except DLException as e:
-            success = handle_exception(e, test)
-        except Exception as e:
-            # print repr(e)
-            pass
+    except DLException as e:
+        print "\n The DLException for get_table_list is: \'",test['name'],"\' the DEBUG INFO is: ",e.info,"\n"
+        success = handle_exception(e, test)
+    except Exception as e:
+        print repr(e)
+        pass
+
     return success
 
 def get_table_info(test):
@@ -506,8 +522,8 @@ def get_table_info(test):
            # Delete date/time properties since they are probably
            # different than the test data. This is okay because
            # the server sets these values on write operations.
-           del data['when_created']
-           del data['last_updated']
+           del data['data']['when_created']
+           del data['data']['last_updated']
 
            success = handle_test(data, test)
                       
@@ -546,7 +562,7 @@ def insert_into(test,dataset_file_path):
         use_raw = use_raw_query(keys, test['parameters'])
         if (use_raw == True):
             data = query_raw('post', '/insert_into', test['parameters'])
-            print "for using raw query insert_table, data is: ",data,"\n"
+            print "for using raw query insert_table, data is: ",data['data'],"\n"
             success = handle_test(None, test)
 
         elif ('values' not in test['parameters']):
@@ -608,7 +624,7 @@ def select_from(test):
 
             data = query_raw('post', '/select_from',test['parameters'])
             
-            success = handle_test(data, test)
+            success = handle_test(data['data'], test)
                         
         else:
 
