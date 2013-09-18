@@ -106,6 +106,8 @@ def handle_exception(e, test):
 
     if (message[0] == 'e' and message[1] == 'r' and message[2] == 'r'):
         message =  message.replace(message[0],'E',1)
+    if (message[0] == 'T' and message[1] == 'r' and message[2] == 'u'):
+        message =  message.replace(message[0],'t',1)
                 
     if (e.status_code == test['expected']['statusCode']
         and message == test['expected']['data']
@@ -524,15 +526,18 @@ def get_table_info(test):
            # the server sets these values on write operations.
            del data['data']['when_created']
            del data['data']['last_updated']
-
-           success = handle_test(data, test)
+           
+           print "\n DEBUG INFO for \'",test['name'],"\' with RAW is: "
+           print data['request'],data['response'],"\n"
+           success = handle_test(data['data'], test)
                       
         else:
             if ('table_name' in test['parameters']):
                 q.get_table_info(test['parameters']['table_name'])
 
             data = client.query(q)
-
+            print "\n DEBUG INFO for \'",test['name'],"\' using CLIENT is: "
+            print data['request'],data['response'],"\n"
             # Delete date/time properties since they are probably
             # different than the test data. This is okay because
             # the server sets these values on write operations.
@@ -541,6 +546,7 @@ def get_table_info(test):
 
             success = handle_test(data['data'], test)
     except DLException as e:
+        print "\n DLException DEBUG INFO for \'",test['name']," \' with RAW is: ",e.info,"\n"
         success = handle_exception(e, test)
     except Exception as e:
         #print repr(e)
@@ -580,10 +586,10 @@ def insert_into(test,dataset_file_path):
             else:
                 q.values(test['parameters']['values'])
                 data = client.query(q)
-
+                
             success = handle_test(None, test)
             print "Performing handle_test ",test['name'],"\n"
-            print "the debug info is: ",data['request'],data['response'],data['data'],"\n"
+            print "the debug info is: ",data['request'],data['response'],"\n"
 
     except DLException as e:
         success = handle_exception(e, test)
@@ -720,7 +726,7 @@ server = restore()
 test_suites = json.load(open(test_file), object_pairs_hook=collections.OrderedDict)
 root_dir = os.path.dirname(test_file)
 dataset_file = root_dir + '/' + test_suites['dataset_file']
-files = test_suites['suites']['all']
+files = test_suites['suites']['tests']
 
 for filename in files:
 

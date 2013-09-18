@@ -132,7 +132,9 @@ class DLClient(object):
             result = {}
             debug_info = self.get_debug_info(r)
             if (q.base_url == '/select_from'):
-                result['data'] = r.json(object_pairs_hook=collections.OrderedDict)            
+                result['data'] = r.json(
+                    object_pairs_hook=collections.OrderedDict
+                )            
             result['response'] = debug_info['response']
             result['request'] = debug_info['request']
             
@@ -148,13 +150,16 @@ class DLClient(object):
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
                 headers ={'Content-type':'application/json'},
+                data = json.dumps(get_body(q)),
                 verify = self.verify_ssl
             )
             
             debug_info = self.get_debug_info(r)
             result = {}
 
-            result['data'] = r.json(object_pairs_hook=collections.OrderedDict)
+            result['data'] = r.json(
+                object_pairs_hook=collections.OrderedDict
+            )
             result['response'] = debug_info['response']
             result['request'] = debug_info['request']
 

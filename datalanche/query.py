@@ -95,7 +95,7 @@ class DLQuery(object):
 
         return self
 
-    def get_table_info(self,table_name):
+    def get_table_info(self,table_name = None):
 
         self.url_type = 'get'
         self.base_url = '/get_table_info'
