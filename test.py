@@ -276,6 +276,8 @@ def alter_table(test):
                     
                     for key, value in test['parameters']['alter_columns'].items():
                         q.alter_column(key, value)
+                        print "For \'",test['name'],"\'"
+                        print "the keys are: ",key, " and the values are",value,"\n"
                 else:
                     q.params['alter_columns'] = test['parameters']['alter_columns']
 
@@ -332,7 +334,8 @@ def create_table(test):
                 q.columns(test['parameters']['columns'])
                 
             data = client.query(q)
-            print "debug info for CREATING table ",data['request'],data['response'],"\n"
+            print "debug info for CREATING table "
+            print data['request'],data['response'],"\n"
             success = handle_test(None, test)
     except DLException as e:
         print "debug info for CREATING table ",e.info,"\n"
@@ -364,7 +367,8 @@ def drop_table(test):
                 q.drop_table(test['parameters']['table_name'])
             
             data = client.query(q)
-            print "\n the debug info for DROPING the table is: ",data['request'],data['response'],"\n"
+            print "\n the debug info for DROPING the table is: "
+            print data['request'],data['response'],"\n"
             success = handle_test(None, test)
     except DLException as e:
         success = handle_exception(e, test)
@@ -423,7 +427,8 @@ def get_table_list(test):
         use_raw = use_raw_query(keys,test['parameters'])
         if (use_raw == True):
             data = query_raw('get','/get_table_list',test['parameters'])
-            print "\n For the get_table_list: \'",test['name'],"\' the DEBUG INFO is: "
+            print "\n For the get_table_list: \'",test['name'],"\'" 
+            print "the DEBUG INFO is: "
             print data['request'],data['response'],data['data'],"\n"
                     
             if (test['expected']['statusCode'] == 200):
@@ -453,7 +458,8 @@ def get_table_list(test):
                 data = collections.OrderedDict()
                 data['num_tables'] = len(tables)
                 data['tables'] = tables
-                print "\n using the unknown_param for \'",test['name'], "\', the data is: ",data,"\n"
+                print "\n using the unknown_param for \'"
+                print test['name'], "\', the data is: ",data,"\n"
                 success = handle_test(data, test)
                         
         # getDatasetList() test is a bit different than the rest
@@ -497,7 +503,8 @@ def get_table_list(test):
                 success = handle_test(data, test)
                 
     except DLException as e:
-        print "\n The DLException for get_table_list is: \'",test['name'],"\' the DEBUG INFO is: ",e.info,"\n"
+        print "\n The DLException for get_table_list is: \'",test['name'],"\'" 
+        print "the DEBUG INFO is: ",e.info,"\n"
         success = handle_exception(e, test)
     except Exception as e:
         print repr(e)
@@ -546,7 +553,7 @@ def get_table_info(test):
 
             success = handle_test(data['data'], test)
     except DLException as e:
-        print "\n DLException DEBUG INFO for \'",test['name']," \' with RAW is: ",e.info,"\n"
+        print "\n DLException DEBUG INFO for \'",test['name']," \' is: ",e.info,"\n"
         success = handle_exception(e, test)
     except Exception as e:
         #print repr(e)
@@ -568,7 +575,8 @@ def insert_into(test,dataset_file_path):
         use_raw = use_raw_query(keys, test['parameters'])
         if (use_raw == True):
             data = query_raw('post', '/insert_into', test['parameters'])
-            print "for using raw query insert_table, data is: ",data['data'],"\n"
+            print "for using raw query insert_table, data is: "
+            data['data'],"\n"
             success = handle_test(None, test)
 
         elif ('values' not in test['parameters']):
@@ -655,7 +663,8 @@ def select_from(test):
             
             data = client.query(q)
             success = handle_test(data['data'], test)
-            print "the debug info for SELECT_FROM  is: ",data['request'],data['response'],data['data'],"\n"
+            print "the debug info for SELECT_FROM  is: "
+            print data['request'],data['response'],data['data'],"\n"
     except DLException as e:
         print "the debug info for EXCEPTION SELECT_FROM is: ",e.info,"\n"
         success = handle_exception(e, test)
@@ -730,7 +739,10 @@ files = test_suites['suites']['tests']
 
 for filename in files:
 
-    jsondata = json.load(open(root_dir + '/' + filename), object_pairs_hook=collections.OrderedDict)
+    jsondata = json.load(
+        open(root_dir + '/' + filename), 
+        object_pairs_hook=collections.OrderedDict
+    )
     num_tests = len(jsondata['tests'])
     total_tests = total_tests + num_tests
 

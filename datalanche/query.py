@@ -25,10 +25,11 @@ class DLQuery(object):
     
     def alter_column(self,column_name, column_object):
         
-        self.params['alter_columns'] = {}
-
+        if 'alter_columns' not in self.params:
+            self.params['alter_columns'] = {}
+        
         self.params['alter_columns'][column_name] = column_object
-
+        
         return self
 
     def alter_table(self, table_name):

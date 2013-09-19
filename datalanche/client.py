@@ -19,7 +19,12 @@ def get_body(query = None):
     if(query == None):
         return body
 
-    return query.params
+    else:
+        for keys,values in query.params.items():
+            body[keys] = values
+
+    print "the body is: ", body
+    return body
         
    
 # For POST, all parameters are in the body so that they are also encrypted.
