@@ -23,7 +23,6 @@ def get_body(query = None):
         for keys,values in query.params.items():
             body[keys] = values
 
-    print "the body is: ", body
     return body
         
    
@@ -103,40 +102,19 @@ class DLClient(object):
         if (q == None):
             print "Error: query is None."
             return None
-            
-        if (q.url_type == 'del'):
-            r = self.client.delete(
-                url = self.url + get_url(q),
-                auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-                headers = {'Content-type':'application/json'},
-                verify = self.verify_ssl
-            )
-            
-            result = {}
-            debug_info = self.get_debug_info(r)
-            
-            result['response'] = debug_info['response']
-            result['request'] = debug_info['request']
-        
-            
-            if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), debug_info)
-                        
-            return result
-                        
-        elif (q.url_type == 'post'):
 
+        if (q.url_type != ''):
             r = self.client.post(
                 url = self.url + get_url(q),
                 auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
                 headers ={'Content-type':'application/json'},
                 data = json.dumps(get_body(q)),
                 verify = self.verify_ssl
-                )
-
+            )
+            
             result = {}
             debug_info = self.get_debug_info(r)
-            if (q.base_url == '/select_from'):
+            if (q.base_url == '/select_from' or q.url_type == 'get'):
                 result['data'] = r.json(
                     object_pairs_hook=collections.OrderedDict
                 )            
@@ -145,34 +123,8 @@ class DLClient(object):
             
             if not 200 <= r.status_code < 300:
                 raise DLException(r.status_code, r.json(), debug_info)
-          
-            return result
-                        
-                            
-        elif (q.url_type == 'get'):
-
-            r = self.client.get(
-                url = self.url + get_url(q),
-                auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-                headers ={'Content-type':'application/json'},
-                data = json.dumps(get_body(q)),
-                verify = self.verify_ssl
-            )
-            
-            debug_info = self.get_debug_info(r)
-            result = {}
-
-            result['data'] = r.json(
-                object_pairs_hook=collections.OrderedDict
-            )
-            result['response'] = debug_info['response']
-            result['request'] = debug_info['request']
-
-            
-            if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), debug_info)
-           
-            return result
                 
+            return result
+            
         else:
             print "Error: unsupported query type"
