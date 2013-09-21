@@ -5,11 +5,9 @@ from datalanche import *
 
 try:
     
-    client = DLClient(
-        host = 'localhost', port = 4001, verify_ssl = False
-    )
-    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
-    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
+    client = DLClient()
+    client.key('your_API_key')
+    client.secret('your_API_secret')
 
     
     e = DLExpression()
@@ -28,5 +26,6 @@ try:
     
     data = client.query(q)
     print "the data is: ", json.dumps(data['data'])
+
 except DLException as e:
     print repr(e)

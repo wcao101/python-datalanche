@@ -4,15 +4,13 @@ import json
 from datalanche import *
 
 try:
-    client = DLClient(
-        host = 'localhost', port = 4001, verify_ssl = False
-    )
-    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
-    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
+    client = DLClient()
+    client.key('your_API_key')
+    client.secret('your_API_secret')
     
     q = DLQuery()
     
-    q.insert_into('my_n_table')
+    q.insert_into('my_table')
     q.values([
         {
             'col1' : '0f21b968-cd28-4d8b-9ea6-33dbcd517ec5',
@@ -32,7 +30,7 @@ try:
     ])
     
     data = client.query(q)
-    print "rows inserted into my_table.", data
+    print "rows inserted into my_table."
     
 except DLException as e:
     print repr(e)

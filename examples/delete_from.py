@@ -5,10 +5,9 @@ from datalanche import *
 
 try:
     
-    client = DLClient(
-        key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', 
-        host = 'localhost', port = 4001, verify_ssl = False
-    )
+    client = DLClient()
+    client.key('your_API_key')
+    client.secret('your_API_secret')
     
     # q.where() is optional however all rows will be deleted
     # from the table if missing.
@@ -21,6 +20,6 @@ try:
     q.where(e)
 
     data = client.query(q)
-    print "row has been successfully deleted!\n", data
+    print "row has been successfully deleted!\n"
 except DLException as e:
     print repr(e)
