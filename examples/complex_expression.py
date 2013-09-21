@@ -6,9 +6,11 @@ from datalanche import *
 try:
     
     client = DLClient(
-        key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', 
         host = 'localhost', port = 4001, verify_ssl = False
     )
+    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
+    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
+
     
     e = DLExpression()
     
@@ -25,6 +27,6 @@ try:
     q.select('*').from_table('my_table').where(e)
     
     data = client.query(q)
-    print "the data is: ", json.dumps(data)
+    print "the data is: ", json.dumps(data['data'])
 except DLException as e:
     print repr(e)

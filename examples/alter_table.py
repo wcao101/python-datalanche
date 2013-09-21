@@ -7,10 +7,11 @@ from datalanche import *
 try:
    
     client = DLClient(
-        key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', 
         host = 'localhost', port = 4001, verify_ssl = False
     )
-    
+    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
+    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
+
     #  Only q.alterTable() is required. The rest are optional and, if present,
     #  will override current values. However add/drop/alter columns are broken
     #  up into individual functions and will do the appropriate function. Note

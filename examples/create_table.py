@@ -5,13 +5,14 @@ from datalanche import *
 
 try:
     
-    client = DLClient(key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', host = 'localhost', port = 4001, verify_ssl = False)
-    
+    client = DLClient(host = 'localhost', port = 4001, verify_ssl = False)
+    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
+    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
     # Only q.createTable() is required. The rest are optional
     # and the server will set defaults.
     
     q = DLQuery()
-    q.create_table('my_table_oop1')
+    q.create_table('my_table')
     q.description('my_table description text')
     q.is_private(True)
     q.license({
@@ -27,7 +28,7 @@ try:
         },
         {
             'name' : 'source2',
-            'url' : 'http://source2.com',
+            'url' : 'http://datalanche.com',
             'description' : 'source2 description text'
         },
     ])
@@ -50,7 +51,7 @@ try:
     ])
     
     data = client.query(q)
-    print "table has been succefully created!", data
+    print "table has been succefully created!\n", data
 except DLException as e:
     print repr(e)
     

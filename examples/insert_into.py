@@ -5,13 +5,14 @@ from datalanche import *
 
 try:
     client = DLClient(
-        key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', 
         host = 'localhost', port = 4001, verify_ssl = False
     )
+    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
+    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
     
     q = DLQuery()
     
-    q.insert_into('my_table')
+    q.insert_into('my_n_table')
     q.values([
         {
             'col1' : '0f21b968-cd28-4d8b-9ea6-33dbcd517ec5',
@@ -30,8 +31,8 @@ try:
         }
     ])
     
-    client.query(q)
-    print "rows inserted into my_table."
+    data = client.query(q)
+    print "rows inserted into my_table.", data
     
 except DLException as e:
     print repr(e)

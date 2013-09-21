@@ -10,7 +10,7 @@ try:
     )
     
     q = DLQuery()
-    q.drop_table('my_table_oop1')
+    q.drop_table('test_dataset')
     
     data = client.query(q)
     

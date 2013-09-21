@@ -5,10 +5,12 @@ from datalanche import *
 
 try:
     client = DLClient(
-        key='7zNN1Pl9SQ6lNZwYe9mtQw==', secret='VCBA1hLyS2mYdrL6kO/iKQ==', 
         host = 'localhost', port = 4001, verify_ssl = False
     )
-    
+    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
+    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==')
+
+
     q = DLQuery()
     
     e = DLExpression()
@@ -23,12 +25,12 @@ try:
         { 'col2' : '$desc' },
     ])
     q.offset(0)
-    q.limit(10)
-    q.total(True)
+    q.limit(1)
+    q.total(False)
     
     
     data = client.query(q)
-    print "The data is: ", data
+    print "The data is: ", json.dumps(data['data'])
         
 except DLException as e:
     print repr(e)

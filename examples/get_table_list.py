@@ -16,7 +16,7 @@ try:
     
     data = client.query(q)
     
-    print "The list of the tables: ", data['request']
+    print "The list of the tables: ", data['data']
     
 except DLException as e:
     print repr(e)
