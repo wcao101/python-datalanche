@@ -7,7 +7,7 @@ from datalanche import *
 try:
    
     client = DLClient()
-    client.key('your_API_key'')
+    client.key('your_API_key')
     client.secret('your_API_secret')
 
     #  Only q.alterTable() is required. The rest are optional and, if present,
