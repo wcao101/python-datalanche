@@ -8,7 +8,6 @@ from StringIO import StringIO
 from exception import DLException
 from requests.auth import HTTPBasicAuth
 
-
 def get_body(query=None):
     body = {}
     if(query == None):
@@ -85,13 +84,15 @@ class DLClient(object):
                 verify=self.verify_ssl)
             result = {}
             debug_info = self.get_debug_info(r)
-            if (q.base_url == '/select_from' or q.url_type == 'get'):
+            try:
                 result['data'] = r.json(
                     object_pairs_hook=collections.OrderedDict)            
+            except Exception as e:
+                result['data'] = None
             result['response'] = debug_info['response']
             result['request'] = debug_info['request']
             if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, r.json(), debug_info)
+                raise DLException(r.status_code, result['data'], debug_info)
             return result
         else:
             raise Exception("Error: unsupported query type!")
