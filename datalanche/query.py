@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import decimal
-import json
-import requests
-import collections
-from exception import DLException
 from expression import DLExpression
-from requests.auth import HTTPBasicAuth
 
 class DLQuery(object):
     def __init__(self):
