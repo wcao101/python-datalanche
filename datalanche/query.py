@@ -68,7 +68,7 @@ class DLQuery(object):
         self.params['table_name'] = table_name
         return self
 
-    def from_table(self, tables=None):
+    def from_tables(self, tables=None):
         self.params['from'] = tables
         return self
 
