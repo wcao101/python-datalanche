@@ -8,7 +8,6 @@ class DLException(Exception):
         self.response_info = debug_info['response']
         self.error_message = response['message']
         self.error_type = response['code']
-        
         self.info = {
             'status_code': status_code,
             'request_info' : debug_info['request'],
@@ -16,7 +15,6 @@ class DLException(Exception):
             'error_message' : response['message'],
             'error_type' : response['code']
         }
-
         exception = {
             'status_code': status_code,
             'request_info' : debug_info['request'],

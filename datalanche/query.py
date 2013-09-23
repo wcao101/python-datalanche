@@ -8,207 +8,148 @@ from exception import DLException
 from expression import DLExpression
 from requests.auth import HTTPBasicAuth
 
-
 class DLQuery(object):
     def __init__(self):
         self.url_type = 'get'
         self.base_url = '/'
         self.params = {}
                    
-    def add_column(self,columns):
-        
+    def add_column(self, columns):
         if 'add_columns' not in self.params:
-            self.params['add_columns'] = []
-
+            self.params['add_columns'] = list()
         self.params['add_columns'].append(columns)
-
         return self
     
-    def alter_column(self,column_name, column_object):
-        
+    def alter_column(self, column_name, column_object):
         if 'alter_columns' not in self.params:
             self.params['alter_columns'] = {}
-        
         self.params['alter_columns'][column_name] = column_object
-        
         return self
 
     def alter_table(self, table_name):
-        
         self.url_type = 'post'
         self.base_url = '/alter_table'
         self.params['table_name'] = table_name
-        
         return self
         
-    def columns(self,object_array):
-        
+    def columns(self, object_array):
         self.params['columns'] = object_array
-        
         return self
 
-    def create_table (self,table_name = None):
-        
+    def create_table (self, table_name=None):
         self.url_type = 'post'
         self.base_url = '/create_table'
         self.params['table_name'] = table_name
-        
         return self
 
-    def delete_from(self,table_name):
-
+    def delete_from(self, table_name):
         self.url_type = 'post'
         self.base_url = '/delete_from'
         self.params['table_name'] = table_name
-
         return self
 
-    def description(self,text):
-        
+    def description(self, text):
         self.params['description'] = text
-        
         return self
 
-    def distinct(self,bool_type = None):
-        
+    def distinct(self, bool_type=None):
         self.params['distinct'] = bool_type
-
         return self
 
-    def drop_column(self,column_name):
-
+    def drop_column(self, column_name):
         if 'drop_columns' not in self.params:
-            self.params['drop_columns'] = []
-        
+            self.params['drop_columns'] = list()
         self.params['drop_columns'].append(column_name)
-
         return self
 
-    def drop_table(self,table_name):
-
+    def drop_table(self, table_name=None):
         self.url_type = 'del'
         self.base_url = '/drop_table'
         self.params['table_name'] = table_name
-
         return self
 
-    def from_table(self,tables = None):
-        
+    def from_table(self, tables=None):
         self.params['from'] = tables
-
         return self
 
-    def get_table_info(self,table_name = None):
-
+    def get_table_info(self, table_name=None):
         self.url_type = 'get'
         self.base_url = '/get_table_info'
         self.params['table_name'] = table_name
-
         return self
 
     def get_table_list(self):
-        
         self.url_type = 'get'
         self.base_url = '/get_table_list'
-
         return self
 
-    def group_by(self,columns = None):
-
+    def group_by(self, columns=None):
         self.params['group_by'] = columns
-
         return self
 
-    def insert_into(self,table_name = None):
-
+    def insert_into(self, table_name=None):
         self.url_type = 'post'
         self.base_url = '/insert_into'
         self.params['table_name'] = table_name
-
         return self
 
-    def is_private(self,bool_type = None):
-        
+    def is_private(self, bool_type=None):
         self.params['is_private'] = bool_type
-
         return self
 
-    def license(self,license_object = None):
-        
+    def license(self, license_object=None):
         self.params['license'] = license_object
-
         return self
 
-    def limit(self,integer = None):
-        
+    def limit(self, integer=None):
         self.params['limit'] = integer
-
         return self
 
-    def offset(self,integer = None):
-
+    def offset(self, integer=None):
         self.params['offset'] = integer
-
         return self
 
-    def order_by(self,object_array = collections.OrderedDict()):
-        
+    def order_by(self, object_array=None):
         self.params['order_by'] = object_array
-
         return self
 
-    def rename(self,table_name = None):
-
+    def rename(self, table_name=None):
         self.params['rename'] = table_name
-
         return self
 
-    def select(self,columns = None):
-
+    def select(self, columns=None):
         self.url_type = 'post'
         self.base_url = '/select_from'
         self.params['select'] = columns
-
         return self
 
-    def set(self,form_map = None):
-
+    def set(self, form_map=None):
         self.params['set'] = form_map
-
         return self
 
-    def sources(self,object_array = collections.OrderedDict()):
-        
+    def sources(self, object_array=None):
         self.params['sources'] = object_array
-
         return self
 
-    def total(self,bool_type = None):
-        
+    def total(self, bool_type=None):
         self.params['total'] = bool_type
-
         return self
 
-    def update(self,table_name = None):
-
+    def update(self, table_name=None):
         self.url_type = 'post'
         self.base_url = '/update'
         self.params['table_name'] = table_name
-
         return self
 
-    def values(self,rows = None):
-
+    def values(self, rows=None):
         self.params['values'] = rows
-
         return self
 
-    def where(self, expression = None):
+    def where(self, expression=None):
         d = DLExpression()
         if(isinstance(expression, type(d))):
             self.params['where'] = expression.json()
         else:
             self.params['where'] = expression
-        
         return self
         
