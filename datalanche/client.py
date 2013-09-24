@@ -9,13 +9,7 @@ from exception import DLException
 from requests.auth import HTTPBasicAuth
 
 def get_body(query=None):
-    body = {}
-    if(query == None):
-        return body
-    else:
-        for keys,values in query.params.items():
-            body[keys] = values
-    return body
+    return query.params
    
 # For POST, all parameters are in the body so that they are also encrypted.
 # For example, the WHERE clause may have unique identifiers, plain-text
