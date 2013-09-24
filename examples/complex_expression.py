@@ -22,7 +22,6 @@ try:
     q.select('*').from_table('my_table').where(e)
     
     data = client.query(q)
-    if 200 <= data['response']['http_status'] < 300:
-        print "the data is: ", json.dumps(data['data'])
+    print "the data is: ", json.dumps(data['data'])
 except DLException as e:
     print repr(e)

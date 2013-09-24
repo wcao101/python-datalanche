@@ -21,7 +21,6 @@ try:
     q.where(e)
         
     data = client.query(q)
-    if 200 <= data['response']['http_status'] < 300:    
-        print "The table has been succefully updated! "
+    print "The table has been succefully updated! "
 except DLException as e:
     print repr(e)

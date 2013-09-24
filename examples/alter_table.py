@@ -42,14 +42,14 @@ try:
     })
     q.drop_column('col2')
     q.drop_column('col3')
-    q.alter_column('col1', 
-                  {
-                      # will only alter col1's data type
-                      'data_type' : 'string'
-                  })
+    q.alter_column(
+        'col1', 
+        {
+            # will only alter col1's data type
+            'data_type' : 'string'
+        })
     
     client.query(q)
-    if 200 <= data['response']['http_status'] < 300:
-        print "Table has been successfully altered!\n"
+    print "Table has been successfully altered!\n"
 except DLException as e:
     print repr(e)

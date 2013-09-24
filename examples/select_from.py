@@ -25,7 +25,6 @@ try:
     q.total(False)
     
     data = client.query(q)
-    if 200 <= data['response']['http_status'] < 300:    
-        print "The data is: ", json.dumps(data['data'])
+    print "The data is: ", json.dumps(data['data'])
 except DLException as e:
     print repr(e)

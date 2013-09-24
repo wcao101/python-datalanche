@@ -4,9 +4,9 @@ import json
 from datalanche import *
 
 try:
-    client = DLClient(host='localhost', port=4001, verify_ssl=False)
-    client.key('7zNN1Pl9SQ6lNZwYe9mtQw==')
-    client.secret('VCBA1hLyS2mYdrL6kO/iKQ==') 
+    client = DLClient()
+    client.key('your_API_key')
+    client.secret('your_API_secret') 
 
     # Only q.createTable() is required. The rest are optional
     # and the server will set defaults.
@@ -50,8 +50,7 @@ try:
     ])
     
     data = client.query(q)
-    if 200 <= data['response']['http_status'] < 300:
-        print "table has been succefully created!\n",data
+    print "table has been succefully created!\n",data
 except DLException as e:
     print "the debug info is: "
     print repr(e)
