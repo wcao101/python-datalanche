@@ -23,7 +23,7 @@ def get_body(query=None):
 def get_url(query=None):
     if (query == None):
         return '/'
-    url = query.base_url
+    url = query.url
     parameters = collections.OrderedDict()
     if (url == '/drop_table'):
         if (query.params['table_name'] != None):
@@ -73,26 +73,22 @@ class DLClient(object):
         
     def query(self,q=None):
         if (q == None):
-            raise Exception("Error: query is None!")
-            return None
-        if (q.url_type != ''):
-            r = self.client.post(
-                url=self.url + get_url(q),
-                auth=HTTPBasicAuth(self.auth_key, self.auth_secret),
-                headers={'Content-type':'application/json'},
-                data=json.dumps(get_body(q)),
-                verify=self.verify_ssl)
-            result = {}
-            debug_info = self.get_debug_info(r)
-            try:
-                result['data'] = r.json(
-                    object_pairs_hook=collections.OrderedDict)            
-            except Exception as e:
-                result['data'] = None
-            result['response'] = debug_info['response']
-            result['request'] = debug_info['request']
-            if not 200 <= r.status_code < 300:
-                raise DLException(r.status_code, result['data'], debug_info)
-            return result
-        else:
-            raise Exception("Error: unsupported query type!")
+            raise ValueError("query is None!")
+        r = self.client.post(
+            url=self.url + get_url(q),
+            auth=HTTPBasicAuth(self.auth_key, self.auth_secret),
+            headers={'Content-type':'application/json'},
+            data=json.dumps(get_body(q)),
+            verify=self.verify_ssl)
+        result = {}
+        debug_info = self.get_debug_info(r)
+        try:
+            result['data'] = r.json(
+                object_pairs_hook=collections.OrderedDict)            
+        except Exception as e:
+            result['data'] = None
+        result['response'] = debug_info['response']
+        result['request'] = debug_info['request']
+        if not 200 <= r.status_code < 300:
+            raise DLException(r.status_code, result['data'], debug_info)
+        return result
