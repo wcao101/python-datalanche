@@ -73,7 +73,7 @@ class DLClient(object):
         
     def query(self,q=None):
         if (q == None):
-            raise ValueError("query is None!")
+            raise Exception("query is None!")
         r = self.client.post(
             url=self.url + get_url(q),
             auth=HTTPBasicAuth(self.auth_key, self.auth_secret),
