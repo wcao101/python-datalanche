@@ -3,8 +3,7 @@ from expression import DLExpression
 
 class DLQuery(object):
     def __init__(self):
-        self.url_type = 'get'
-        self.base_url = '/'
+        self.url = '/'
         self.params = {}
                    
     def add_column(self, columns):
@@ -20,8 +19,7 @@ class DLQuery(object):
         return self
 
     def alter_table(self, table_name):
-        self.url_type = 'post'
-        self.base_url = '/alter_table'
+        self.url = '/alter_table'
         self.params['table_name'] = table_name
         return self
         
@@ -30,14 +28,12 @@ class DLQuery(object):
         return self
 
     def create_table (self, table_name=None):
-        self.url_type = 'post'
-        self.base_url = '/create_table'
+        self.url = '/create_table'
         self.params['table_name'] = table_name
         return self
 
     def delete_from(self, table_name):
-        self.url_type = 'post'
-        self.base_url = '/delete_from'
+        self.url = '/delete_from'
         self.params['table_name'] = table_name
         return self
 
@@ -56,8 +52,7 @@ class DLQuery(object):
         return self
 
     def drop_table(self, table_name=None):
-        self.url_type = 'del'
-        self.base_url = '/drop_table'
+        self.url = '/drop_table'
         self.params['table_name'] = table_name
         return self
 
@@ -66,14 +61,12 @@ class DLQuery(object):
         return self
 
     def get_table_info(self, table_name=None):
-        self.url_type = 'get'
-        self.base_url = '/get_table_info'
+        self.url = '/get_table_info'
         self.params['table_name'] = table_name
         return self
 
     def get_table_list(self):
-        self.url_type = 'get'
-        self.base_url = '/get_table_list'
+        self.url = '/get_table_list'
         return self
 
     def group_by(self, columns=None):
@@ -81,8 +74,7 @@ class DLQuery(object):
         return self
 
     def insert_into(self, table_name=None):
-        self.url_type = 'post'
-        self.base_url = '/insert_into'
+        self.url = '/insert_into'
         self.params['table_name'] = table_name
         return self
 
@@ -111,8 +103,7 @@ class DLQuery(object):
         return self
 
     def select(self, columns=None):
-        self.url_type = 'post'
-        self.base_url = '/select_from'
+        self.url = '/select_from'
         self.params['select'] = columns
         return self
 
@@ -129,8 +120,7 @@ class DLQuery(object):
         return self
 
     def update(self, table_name=None):
-        self.url_type = 'post'
-        self.base_url = '/update'
+        self.url = '/update'
         self.params['table_name'] = table_name
         return self
 
