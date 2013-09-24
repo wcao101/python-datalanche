@@ -3,9 +3,7 @@
 import json
 from datalanche import *
 
-
 try:
-   
     client = DLClient()
     client.key('your_API_key')
     client.secret('your_API_secret')
@@ -13,8 +11,8 @@ try:
     #  Only q.alterTable() is required. The rest are optional and, if present,
     #  will override current values. However add/drop/alter columns are broken
     #  up into individual functions and will do the appropriate function. Note
-    # that dropping or altering columns of an existing table can delete existing data.
-    
+    #  that dropping or altering columns of an existing table can delete 
+    #  existing data.
     q = DLQuery()
     q.alter_table('my_table')
     q.rename('my_new_table')
@@ -46,12 +44,12 @@ try:
     q.drop_column('col3')
     q.alter_column('col1', 
                   {
-            # will only alter col1's data type
+                      # will only alter col1's data type
                       'data_type' : 'string'
                   })
     
     client.query(q)
-    print "Table has been successfully altered!\n"
-
+    if 200 <= data['response']['http_status'] < 300:
+        print "Table has been successfully altered!\n"
 except DLException as e:
-    print (e)
+    print repr(e)

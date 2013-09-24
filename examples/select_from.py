@@ -7,14 +7,12 @@ try:
     client = DLClient()
     client.key('your_API_key')
     client.secret('your_API_secret')
-
-
-    q = DLQuery()
     
     e = DLExpression()
     e.column('col3').contains('hello')
     
     # if you want all columns use q.select('*')
+    q = DLQuery()
     q.select([ 'col1', 'col2' ]) 
     q.from_table('my_table')
     q.where(e)
@@ -26,9 +24,8 @@ try:
     q.limit(1)
     q.total(False)
     
-    
     data = client.query(q)
-    print "The data is: ", json.dumps(data['data'])
-        
+    if 200 <= data['response']['http_status'] < 300:    
+        print "The data is: ", json.dumps(data['data'])
 except DLException as e:
     print repr(e)

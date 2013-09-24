@@ -9,7 +9,6 @@ try:
     client.secret('your_API_secret')
     
     q = DLQuery()
-    
     q.insert_into('my_table')
     q.values([
         {
@@ -30,7 +29,7 @@ try:
     ])
     
     data = client.query(q)
-    print "rows inserted into my_table."
-    
+    if 200 <= data['response']['http_status'] < 300:    
+        print "rows inserted into my_table."
 except DLException as e:
     print repr(e)
