@@ -10,28 +10,6 @@ from requests.auth import HTTPBasicAuth
 
 def get_body(query=None):
     return query.params
-   
-# For POST, all parameters are in the body so that they are also encrypted.
-# For example, the WHERE clause may have unique identifiers, plain-text
-# passwords, and other potentially sensitive information.
-def get_url(query=None):
-    if (query == None):
-        return '/'
-    url = query.url
-    parameters = collections.OrderedDict()
-    if (url == '/drop_table'):
-        if (query.params['table_name'] != None):
-            parameters['table_name'] = query.params['table_name']
-    elif (url == '/get_table_info'):
-        if (query.params['table_name'] != None):
-            parameters['table_name'] = query.params['table_name']
-    elif (url == '/get_table_list'):
-        pass
-        # do nothing
-    query_str = urllib.urlencode(parameters)
-    if (query_str != ''):
-        url += '?' + query_str
-    return url
 
 class DLClient(object):
     def __init__(
@@ -69,7 +47,7 @@ class DLClient(object):
         if (q == None):
             raise Exception("query is None!")
         r = self.client.post(
-            url=self.url + get_url(q),
+            url=self.url + q.url,
             auth=HTTPBasicAuth(self.auth_key, self.auth_secret),
             headers={'Content-type':'application/json'},
             data=json.dumps(get_body(q)),
