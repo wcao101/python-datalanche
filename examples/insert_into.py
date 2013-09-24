@@ -28,7 +28,10 @@ try:
         }
     ])
     
-    data = client.query(q)
-    print "rows inserted into my_table."
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "rows inserted into my_table successfully!"
 except DLException as e:
     print repr(e)

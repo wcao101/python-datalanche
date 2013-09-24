@@ -9,10 +9,13 @@ try:
     client.secret('your_API_secret')
     
     q = DLQuery()
-    q.drop_table('my_3_table')
+    q.drop_table('my_table')
     
-    data = client.query(q)
-    print "table has been dropped/deleted\n"
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "table has been dropped/deleted successfully!\n"
 except DLException as e:
     print repr(e)
     

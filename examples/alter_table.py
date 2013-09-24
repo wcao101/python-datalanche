@@ -49,7 +49,10 @@ try:
             'data_type' : 'string'
         })
     
-    client.query(q)
-    print "Table has been successfully altered!\n"
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "Table has been alteredsuccessfully!\n"
 except DLException as e:
     print repr(e)

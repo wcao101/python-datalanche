@@ -17,7 +17,10 @@ try:
     q.delete_from('my_table')
     q.where(e)
 
-    data = client.query(q)
-    print "row has been successfully deleted!\n"
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "row has been deleted successfully!!\n"
 except DLException as e:
     print repr(e)

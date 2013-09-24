@@ -6,12 +6,12 @@ from datalanche import *
 try:
     client = DLClient()
     client.key('your_API_key')
-    client.secret('your_API_secret') 
+    client.secret('your_API_secret')
 
     # Only q.createTable() is required. The rest are optional
     # and the server will set defaults.
     q = DLQuery()
-    q.create_table('my_9_table')
+    q.create_table('my_table')
     q.description('my_table description text')
     q.is_private(True)
     q.license({
@@ -49,9 +49,11 @@ try:
         }
     ])
     
-    data = client.query(q)
-    print "table has been succefully created!\n",data
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "table has been created successfully!!\n"
 except DLException as e:
-    print "the debug info is: "
     print repr(e)
     

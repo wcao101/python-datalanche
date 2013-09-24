@@ -11,7 +11,10 @@ try:
     q = DLQuery()
     q.get_table_list()
     
-    data = client.query(q)
-    print "The list of the tables: ", json.dumps(data['data'])
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "The list of the tables: ", json.dumps(result['data'])
 except DLException as e:
     print repr(e)

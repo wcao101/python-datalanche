@@ -8,8 +8,6 @@ try:
     client.key('your_API_key')
     client.secret('your_API_secret')
     
-
-    
     e = DLExpression()
     e.column('col3').contains('hello')
 
@@ -20,7 +18,10 @@ try:
     })
     q.where(e)
         
-    data = client.query(q)
-    print "The table has been succefully updated! "
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "The table has been updated successfully!! "
 except DLException as e:
     print repr(e)

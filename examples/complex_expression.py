@@ -21,7 +21,10 @@ try:
     q = DLQuery()    
     q.select('*').from_table('my_table').where(e)
     
-    data = client.query(q)
-    print "the data is: ", json.dumps(data['data'])
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "the data is: ", json.dumps(result['data']),"\n"
 except DLException as e:
     print repr(e)

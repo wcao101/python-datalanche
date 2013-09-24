@@ -14,7 +14,7 @@ try:
     # if you want all columns use q.select('*')
     q = DLQuery()
     q.select([ 'col1', 'col2' ]) 
-    q.from_table('my_table')
+    q.from_tables('my_table')
     q.where(e)
     q.order_by([
         { 'col1' : '$asc' },
@@ -24,7 +24,10 @@ try:
     q.limit(1)
     q.total(False)
     
-    data = client.query(q)
-    print "The data is: ", json.dumps(data['data'])
+    result = client.query(q)
+    # if request or response is needed:
+    # print json.dumps(result['request']), "\n"
+    # print json.dumps(result['response']), "\n"
+    print "The data is: ", json.dumps(result['data'])
 except DLException as e:
     print repr(e)
