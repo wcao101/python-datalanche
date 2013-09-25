@@ -8,7 +8,7 @@ try:
     client.key('your_API_key')
     client.secret('your_API_secret')
 
-    #  Only q.alterTable() is required. The rest are optional and, if present,
+    #  Only q.alter_table() is required. The rest are optional and, if present,
     #  will override current values. However add/drop/alter columns are broken
     #  up into individual functions and will do the appropriate function. Note
     #  that dropping or altering columns of an existing table can delete 

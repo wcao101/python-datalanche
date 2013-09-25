@@ -8,7 +8,7 @@ try:
     client.key('your_API_key')
     client.secret('your_API_secret')
 
-    # Only q.createTable() is required. The rest are optional
+    # Only q.create_table() is required. The rest are optional
     # and the server will set defaults.
     q = DLQuery()
     q.create_table('my_table')
@@ -49,7 +49,7 @@ try:
         }
     ])
     
-    result = client.query(q)
+    result = client.query(None)
     # if request or response is needed:
     # print json.dumps(result['request']), "\n"
     # print json.dumps(result['response']), "\n"
