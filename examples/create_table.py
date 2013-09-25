@@ -49,7 +49,7 @@ try:
         }
     ])
     
-    result = client.query(None)
+    result = client.query(q)
     # if request or response is needed:
     # print json.dumps(result['request']), "\n"
     # print json.dumps(result['response']), "\n"
