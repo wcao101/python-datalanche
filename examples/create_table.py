@@ -4,56 +4,65 @@ import json
 from datalanche import *
 
 try:
-    client = DLClient()
-    client.key('your_API_key')
-    client.secret('your_API_secret')
+    client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    # Only q.create_table() is required. The rest are optional
-    # and the server will set defaults.
-    q = DLQuery()
-    q.create_table('my_table')
-    q.description('my_table description text')
-    q.is_private(True)
-    q.license({
-        'name' : 'license name',
-        'url' : 'http://license.com',
-        'description' : 'license description text'
-    })
-    q.sources([
-        {
-            'name' : 'source1',
-            'url' : 'http://source1.com',
-            'description' : 'source1 description text'
+    definition = {
+        'schema_name': 'my_schema',
+        'table_name': 'my_table',
+        'description': 'my_table description text',
+        'is_private': True,
+        'license': {
+            'name': 'public domain',
+            'description': 'this table is public domain',
+            'url': None
         },
-        {
-            'name' : 'source2',
-            'url' : 'http://datalanche.com',
-            'description' : 'source2 description text'
+        'sources': {
+            'source1': {
+                'url' : 'http://source1.com',
+                'description' : 'source1 description text'
+            },
+            'source2': {
+                'url' : 'http://source2.com',
+                'description' : 'source2 description text'
+            }
         },
-    ])
-    q.columns([
-        {
-            'name' : 'col1',
-            'data_type' : 'uuid',
-            'description' : 'col1 description text'
+        'columns': {
+            'col1': {
+                'data_type': 'uuid',
+                'description': 'col1 description text',
+                'not_null': True
+            },
+            'col2': {
+                'data_type': 'text',
+                'description': 'col2 description text',
+                'default_value': None,
+                'not_null': False
+            },
+            'col3': {
+                'data_type': 'integer',
+                'description': 'col3 description text',
+                'default_value': 0,
+                'not_null': True
+            }
         },
-        {
-            'name' : 'col2',
-            'data_type' : 'timestamp',
-            'description' : 'col2 description text'
+        'constraints': {
+            'primary_key': 'col1'
         },
-        {
-            'name' : 'col3',
-            'data_type' : 'string',
-            'description' : 'col3 description text'
+        'indexes': {},
+        'collaborators': {
+            'bob': 'read',
+            'slob': 'read/write',
+            'knob': 'admin'
         }
-    ])
+    }
+
+    q = DLQuery()
+    q.create_table(definition)
     
-    result = client.query(q)
-    # if request or response is needed:
-    # print json.dumps(result['request']), "\n"
-    # print json.dumps(result['response']), "\n"
-    print "table has been created successfully!!\n"
+    client.query(q)
+    print 'create_table succeeded'
+
 except DLException as e:
     print repr(e)
-    
+except Exception as ex:
+    print repr(ex)
