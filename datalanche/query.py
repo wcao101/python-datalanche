@@ -4,9 +4,11 @@ from expression import DLExpression
 
 class DLQuery(object):
 
-    def __init__(self):
+    def __init__(self, database_name = None):
         self.url = '/'
         self.params = collections.OrderedDict()
+        if database_name != None:
+            self.params['database'] = database_name
 
     #
     # COMMON
@@ -18,10 +20,6 @@ class DLQuery(object):
 
     def columns(self, columns):
         self.params['columns'] = columns
-        return self # method chaining
-
-    def database(self, database_name):
-        self.params['database'] = database_name
         return self # method chaining
 
     def description(self, text):
@@ -202,16 +200,16 @@ class DLQuery(object):
         self.params['index_name'] = index_name
         return self # method chaining
 
-    def is_unique(self, boolean):
-        self.params['is_unique'] = boolean
-        return self # method chaining
-
     def method(self, text):
         self.params['method'] = text
         return self # method chaining
 
     def on_table(self, tableName):
         self.params['table_name'] = tableName
+        return self # method chaining
+
+    def unique(self, boolean):
+        self.params['is_unique'] = boolean
         return self # method chaining
 
     #
