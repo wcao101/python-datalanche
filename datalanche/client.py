@@ -4,7 +4,6 @@ import json
 import requests
 import collections
 import urllib
-from StringIO import StringIO
 from exception import DLException
 from requests.auth import HTTPBasicAuth
 
@@ -45,11 +44,19 @@ class DLClient(object):
         if q == None:
             raise Exception('query == None')
 
+        params = collections.OrderedDict(q.params)
+
+        url = self.url
+        if 'database' in params:
+            url = url + '/' + urllib.quote_plus(str(params['database']))
+            del params['database']
+        url = url + '/query'
+
         r = self.client.post(
-            url = self.url + q.url,
+            url = url,
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
             headers = { 'Content-Type': 'application/json' },
-            data = json.dumps(q.params),
+            data = json.dumps(params),
             verify = self.verify_ssl
         )
 

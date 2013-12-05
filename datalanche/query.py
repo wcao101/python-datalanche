@@ -5,7 +5,6 @@ from expression import DLExpression
 class DLQuery(object):
 
     def __init__(self, database_name = None):
-        self.url = '/'
         self.params = collections.OrderedDict()
         if database_name != None:
             self.params['database'] = database_name
@@ -104,8 +103,7 @@ class DLQuery(object):
     #
 
     def alter_database(self, database_name):
-        self.url = '/alter_database'
-        self.params['database'] = database_name
+        self.params['alter_database'] = database_name
         return self # method chaining
 
     def add_collaborator(self, username, permission):
@@ -135,8 +133,7 @@ class DLQuery(object):
     #
 
     def alter_index(self, index_name):
-        self.url = '/alter_index'
-        self.params['index_name'] = index_name
+        self.params['alter_index'] = index_name
         return self # method chaining
 
     #
@@ -144,8 +141,7 @@ class DLQuery(object):
     #
 
     def alter_schema(self, schema_name):
-        self.url = '/alter_schema'
-        self.params['schema_name'] = schema_name
+        self.params['alter_schema'] = schema_name
         return self # method chaining
 
     #
@@ -153,8 +149,7 @@ class DLQuery(object):
     #
 
     def alter_table(self, table_name):
-        self.url = '/alter_table'
-        self.params['table_name'] = table_name
+        self.params['alter_table'] = table_name
         return self # method chaining
 
     def add_column(self, column_name, attributes):
@@ -196,8 +191,7 @@ class DLQuery(object):
     #
 
     def create_index(self, index_name):
-        self.url = '/create_index'
-        self.params['index_name'] = index_name
+        self.params['create_index'] = index_name
         return self # method chaining
 
     def method(self, text):
@@ -205,11 +199,11 @@ class DLQuery(object):
         return self # method chaining
 
     def on_table(self, tableName):
-        self.params['table_name'] = tableName
+        self.params['on_table'] = tableName
         return self # method chaining
 
     def unique(self, boolean):
-        self.params['is_unique'] = boolean
+        self.params['unique'] = boolean
         return self # method chaining
 
     #
@@ -217,8 +211,7 @@ class DLQuery(object):
     #
 
     def create_schema(self, schema_name):
-        self.url = '/create_schema'
-        self.params['schema_name'] = schema_name
+        self.params['create_schema'] = schema_name
         return self # method chaining
 
     #
@@ -226,8 +219,7 @@ class DLQuery(object):
     #
 
     def create_table(self, table_name):
-        self.url = '/create_table'
-        self.params['table_name'] = table_name
+        self.params['create_table'] = table_name
         return self # method chaining
 
     # TODO: constraints
@@ -237,8 +229,7 @@ class DLQuery(object):
     #
 
     def delete_from(self, table_name):
-        self.url = '/delete'
-        self.params['table_name'] = table_name
+        self.params['delete_from'] = table_name
         return self # method chaining
 
     #
@@ -246,8 +237,7 @@ class DLQuery(object):
     #
 
     def describe_database(self, database_name):
-        self.url = '/describe_database'
-        self.params['database'] = database_name
+        self.params['describe_database'] = database_name
         return self # method chaining
 
     #
@@ -255,8 +245,7 @@ class DLQuery(object):
     #
 
     def describe_schema(self, schema_name):
-        self.url = '/describe_schema'
-        self.params['schema_name'] = schema_name
+        self.params['describe_schema'] = schema_name
         return self # method chaining
 
     #
@@ -264,8 +253,7 @@ class DLQuery(object):
     #
 
     def describe_table(self, table_name):
-        self.url = '/describe_table'
-        self.params['table_name'] = table_name
+        self.params['describe_table'] = table_name
         return self # method chaining
 
     #
@@ -273,8 +261,7 @@ class DLQuery(object):
     #
 
     def drop_index(self, index_name):
-        self.url = '/drop_index'
-        self.params['index_name'] = index_name
+        self.params['drop_index'] = index_name
         return self # method chaining
 
     #
@@ -282,8 +269,7 @@ class DLQuery(object):
     #
 
     def drop_schema(self, schema_name):
-        self.url = '/drop_schema'
-        self.params['schema_name'] = schema_name
+        self.params['drop_schema'] = schema_name
         return self # method chaining
 
     #
@@ -291,8 +277,7 @@ class DLQuery(object):
     #
 
     def drop_table(self, table_name):
-        self.url = '/drop_table'
-        self.params['table_name'] = table_name
+        self.params['drop_table'] = table_name
         return self # method chaining
 
     #
@@ -300,8 +285,7 @@ class DLQuery(object):
     #
 
     def insert_into(self, table_name):
-        self.url = '/insert'
-        self.params['table_name'] = table_name
+        self.params['insert_into'] = table_name
         return self # method chaining
 
     def values(self, rows):
@@ -313,7 +297,6 @@ class DLQuery(object):
     #
 
     def select(self, columns):
-        self.url = '/select'
         self.params['select'] = columns
         return self # method chaining
 
@@ -354,7 +337,7 @@ class DLQuery(object):
     #
 
     def show_databases(self):
-        self.url = '/show_databases'
+        self.params['show_databases'] = True
         return self # method chaining
 
     #
@@ -362,7 +345,7 @@ class DLQuery(object):
     #
 
     def show_schemas(self):
-        self.url = '/show_schemas'
+        self.params['show_schemas'] = True
         return self # method chaining
 
     #
@@ -370,7 +353,7 @@ class DLQuery(object):
     #
 
     def show_tables(self):
-        self.url = '/show_tables'
+        self.params['show_tables'] = True
         return self # method chaining
 
     #
@@ -378,8 +361,7 @@ class DLQuery(object):
     #
 
     def update(self, table_name):
-        self.url = '/update'
-        self.params['table_name'] = table_name
+        self.params['update'] = table_name
         return self # method chaining
 
     def set(self, kv_pairs):
