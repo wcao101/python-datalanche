@@ -300,6 +300,10 @@ class DLQuery(object):
         self.params['select'] = columns
         return self # method chaining
 
+    def select_all(self):
+        self.params['select'] = True
+        return self # method chaining
+
     def distinct(self, boolean):
         self.params['distinct'] = boolean
         return self # method chaining

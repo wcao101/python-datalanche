@@ -14,7 +14,7 @@ try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
     q = DLQuery('my_database')
-    q.select('*')
+    q.select_all()
     q.from_tables(q.expr(
         q.table('t1'),
         '$join', q.table('t2'), '$on', q.column('t1.c1'), '=', q.column('t2.c1'),
