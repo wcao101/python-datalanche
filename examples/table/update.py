@@ -20,7 +20,7 @@ try:
 
     result = client.query(q)
 
-    print json.dumps(result)
+    print json.dumps(result, indent=2)
 
 except DLException as e:
     print repr(e)

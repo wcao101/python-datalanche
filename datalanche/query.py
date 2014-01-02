@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import collections
-from expression import DLExpression
 
 class DLQuery(object):
 

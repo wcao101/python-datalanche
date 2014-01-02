@@ -21,7 +21,7 @@ class DLClient(object):
 
     def key(self, key):
         self.auth_key = key
-        
+
     def secret(self, secret):
         self.auth_secret = secret
 
@@ -55,7 +55,11 @@ class DLClient(object):
         r = self.client.post(
             url = url,
             auth = HTTPBasicAuth(self.auth_key, self.auth_secret),
-            headers = { 'Content-Type': 'application/json' },
+            headers = {
+                'Accept-Encoding': 'gzip',
+                'Content-Type': 'application/json',
+                'User-Agent': 'Datalanche Python Client'
+            },
             data = json.dumps(params),
             verify = self.verify_ssl
         )
