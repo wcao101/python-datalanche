@@ -15,7 +15,7 @@ from datalanche import *
 try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    q = DLQuery('my_database')
+    q = DLQuery(database='my_database')
     q.create_table('my_schema.my_table')
     q.description('my_table description text')
     q.columns({

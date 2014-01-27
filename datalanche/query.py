@@ -3,10 +3,10 @@ import collections
 
 class DLQuery(object):
 
-    def __init__(self, database_name = None):
+    def __init__(self, database = None):
         self.params = collections.OrderedDict()
-        if database_name != None:
-            self.params['database'] = database_name
+        if database != None:
+            self.params['database'] = database
 
     #
     # COMMON
@@ -125,6 +125,10 @@ class DLQuery(object):
 
     def is_private(self, boolean):
         self.params['is_private'] = boolean
+        return self # method chaining
+
+    def max_size_gb(self, integer):
+        self.params['max_size_gb'] = integer
         return self # method chaining
 
     #

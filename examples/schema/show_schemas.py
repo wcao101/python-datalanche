@@ -8,7 +8,7 @@ from datalanche import *
 try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    q = DLQuery()
+    q = DLQuery(database='my_database')
     q.show_schemas()
 
     result = client.query(q)

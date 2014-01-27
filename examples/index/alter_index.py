@@ -11,7 +11,7 @@ from datalanche import *
 try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    q = DLQuery('my_database')
+    q = DLQuery(database='my_database')
     q.alter_index('my_schema.my_index')
     q.rename_to('my_new_index')
 

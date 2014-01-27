@@ -15,7 +15,7 @@ from datalanche import *
 try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    q = DLQuery('my_database')
+    q = DLQuery(database='my_database')
     q.select([ 'col1', 'col2' ])
     q.distinct(True)
     q.from_tables('my_schema.my_table')

@@ -13,7 +13,7 @@ from datalanche import *
 try:
     client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
 
-    q = DLQuery('my_database')
+    q = DLQuery(database='my_database')
     q.select_all()
     q.from_tables(q.expr(
         q.table('t1'),
