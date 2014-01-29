@@ -300,6 +300,8 @@ class DLQuery(object):
     #
 
     def select(self, columns):
+        if columns == '*':
+            raise Exception('please use select_all() instead of select("*")')
         self.params['select'] = columns
         return self # method chaining
 
