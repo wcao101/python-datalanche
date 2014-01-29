@@ -5,7 +5,7 @@ required = ['requests == 1.2']
 setup(
     author='Datalanche, Inc.',
     name='datalanche',
-    version='0.8.8',
+    version='0.8.9',
     description='Official Python client for Datalanche.',
     long_description=open('README.md').read(),
     url='https://github.com/datalanche/python-datalanche',
