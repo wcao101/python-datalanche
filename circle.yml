@@ -1,0 +1,19 @@
+## Customize the test machine
+machine:
+
+  timezone:
+    UTC # Set the timezone to UTC
+
+  # Version of python to use
+  python:
+    version: 2.7.5
+
+## Customize test commands
+test:
+  override:
+  - python examples/schema/create_schema.py
+  - python examples/schema/describe_schema.py
+  - python examples/schema/show_schema.py
+  - python examples/schema/alter_schema.py
+  - python examples/schema/drop_schema.py
+
