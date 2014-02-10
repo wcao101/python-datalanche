@@ -26,6 +26,9 @@ try:
                       port = config['port'], 
                       verify_ssl = config['verify_ssl'])
 
+    # or you can also set your API_KEY and API_SECRET to python client like this
+    # client = DLClient(key='YOUR_API_KEY', secret='YOUR_API_SECRET')
+
     q = DLQuery(database='my_database')
     q.describe_schema('my_new_schema')
 
