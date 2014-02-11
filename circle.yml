@@ -59,7 +59,7 @@ test:
     - python examples/table/drop_table.py
 
     # drop the alterred talbe by using curl, finishing table example testing
-    - curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{"drop_table": "my_database.my_new_schema.my_new_table"}' 
+    - curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{"drop_table": "my_database.my_new_schema.my_new_table"}' https://api.datalanche.com/query
 
 
     # alter the schema back to my_schema from my_new_schema set by alter_table.py
