@@ -61,7 +61,7 @@ test:
     # drop the alterred talbe by using curl, finishing table example testing
     - bash -c "curl "https://api.datalanche.com/query"
     	      -X POST
-  	      -u "tLc1itNoSueOnWm5rjc5BQ==:/HYYeNGXSeuiLpTUnePQqQ=="
+  	      -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
   	      -H "Content-Type: application/json"
   	      -d '{
 		    "drop_table": "my_database.my_new_schema.my_new_table"
@@ -71,7 +71,7 @@ test:
     # alter the schema back to my_schema from my_new_schema set by alter_table.py
     - bash -c "curl "https://api.datalanche.com/query"
       	      -X POST
-  	      -u "tLc1itNoSueOnWm5rjc5BQ==:/HYYeNGXSeuiLpTUnePQqQ=="
+  	      -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
   	      -H "Content-Type: application/json"
   	      -d '{
         	    "alter_schema": "my_new_schema",
@@ -94,7 +94,7 @@ test:
     # drop the alterred schema resulted by alter_schema.py and cleaning schema
     -bash -c "curl "https://api.datalanche.com/example_database/query"
   	     -X POST
-  	     -u "tLc1itNoSueOnWm5rjc5BQ==:/HYYeNGXSeuiLpTUnePQqQ=="
+  	     -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
   	     -H "Content-Type: application/json"
   	     -d '{
 	  	   "drop_schema": "example_schema",
@@ -117,7 +117,7 @@ test:
     # alter the my_new_database to my_database
     -bash -c "curl "https://api.datalanche.com/query"
   	     -X POST
-  	     -u "tLc1itNoSueOnWm5rjc5BQ==:/HYYeNGXSeuiLpTUnePQqQ=="
+  	     -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
   	     -H "Content-Type: application/json"
   	     -d '{
 		    "alter_database": "my_new_database",
