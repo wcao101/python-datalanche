@@ -13,7 +13,7 @@ try:
 
     config = json.load(open("../../config.json"))
 
-    # Please found your API credentials here: datalanche.com/account/login before use
+    # Please find your API credentials here: https://www.datalanche.com/account before use            
     YOUR_API_KEY = config['api_key']
     YOUR_API_SECRET = config['api_secret']
     
