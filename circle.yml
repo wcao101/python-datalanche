@@ -8,6 +8,11 @@ machine:
   python:
     version: 2.7.5
 
+  # setup the right setup_tools for installing datalanche
+  post:
+    - wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    - python ez_setup.py --user ubuntu
+
 ## Customize test commands
 test:
   override:
