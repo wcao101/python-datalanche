@@ -2,6 +2,26 @@
 # file
 cd ./examples/schema
 
+
+# make sure the previous database's name is changed back to my_database
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+                        "alter_database": "my_new_database",
+                        "rename_to": "my_database"
+                      }' https://api.datalanche.com/my_new_database/query
+
+# make sure previous schemas are cleaned up before examples testing
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_schema",
+                        "cascade": true
+                      }' https://api.datalanche.com/my_database/query
+
+# make sure the previous alterred schemas are cleaned up before examples testing
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_new_schema",
+                        "cascade": true
+                      }'  https://api.datalanche.com/my_database/query
+
+
 # schema examples
 # create a schema
 python create_schema.py
@@ -50,15 +70,11 @@ python ../table/delete.py
 python ../table/drop_table.py
 
 # alter the schema back to my_schema from my_new_schema set by alter_table.py
-curl "https://api.datalanche.com/my_database/query"
-     -X POST
-  	 -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
-  	 -H "Content-Type: application/json"
-  	 -d '{
-            "alter_schema": "my_new_schema",
-        	  "rename_to": "my_schema",
-        	  "description": "A new, optional description of renamed_schema."
-      	}'
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+                         "alter_schema": "my_new_schema",
+        	               "rename_to": "my_schema",
+        	               "description": "A new, optional description of renamed_schema."
+      	             }' "https://api.datalanche.com/my_database/query"
 
 # alter my_schema to my_new_schema
 python ../schema/alter_schema.py
@@ -73,14 +89,10 @@ python ../schema/create_schema.py
 python ../schema/drop_schema.py
 
 # drop the alterred schema resulted by alter_schema.py and cleaning schema
-curl "https://api.datalanche.com/my_database/query"
-  	 -X POST
-  	 -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
-  	 -H "Content-Type: application/json"
-  	 -d '{
-	  	      "drop_schema": "example_schema",
-            "cascade": true
-      	}'
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+	  	                  "drop_schema": "my_new_schema",
+                        "cascade": true
+      	              }'  "https://api.datalanche.com/my_database/query"
   
 # database examples
 # describe the database
@@ -96,14 +108,10 @@ python ../database/alter_database.py
 python ../database/show_database.py
 
 # alter the my_new_database to my_database
-curl "https://api.datalanche.com/my_database/query"
-  	 -X POST
-  	 -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg="
-  	 -H "Content-Type: application/json"
-  	 -d '{
-		        "alter_database": "my_new_database",
-        	  "rename_to": "my_database"
-      	}'
+curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg=" -H "Content-Type: application/json" -d '{
+		                     "alter_database": "my_new_database",
+        	               "rename_to": "my_database"
+      	             }' "https://api.datalanche.com/my_database/query"
 
 # show the database to check if the database is altered back to my_database
 python ../database/show_database.py
