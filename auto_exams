@@ -2,19 +2,19 @@
 # file
 cd ./examples/schema
 
-echo
+echo Make sure the previous database's name is changed back to my_database
 # make sure the previous database's name is changed back to my_database
 curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
                         "alter_database": "my_new_database",
                         "rename_to": "my_database"
                       }' 
-echo 
+echo make sure previous schemas are cleaned up before examples testing
 # make sure previous schemas are cleaned up before examples testing
 curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
                         "drop_schema": "my_schema",
                         "cascade": true
                       }'
-echo
+echo make sure the previous alterred schemas are cleaned up before examples testing
 # make sure the previous alterred schemas are cleaned up before examples testing
 curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
                         "drop_schema": "my_new_schema",
@@ -22,15 +22,19 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
                       }'
 
 
-echo
+
 # schema examples
 # create a schema
-python create_schema.py
+echo create a schema
+python ../schema/create_schema.py
 
-echo
-# describe the schema
-python ../schema/describe_schema.py
 
-echo
 # show the created schema
+echo show schemas created in my_database
 python ../schema/show_schemas.py
+
+# table examples
+# create a table
+echo create a new table with the name of my_table
+python ../table/create_table.py
+
