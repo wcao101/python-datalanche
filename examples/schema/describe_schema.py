@@ -17,7 +17,7 @@ try:
     client = DLClient(key = YOUR_API_KEY, secret = YOUR_API_SECRET)
 
     q = DLQuery(database='my_database')
-    q.describe_schema('my_new_schema')
+    q.describe_schema('my_schema')
 
     result = client.query(q)
 

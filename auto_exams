@@ -28,6 +28,9 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
 echo create a schema
 python ../schema/create_schema.py
 
+# describe the schema
+echo describe the schema
+python ../schema/describe_schema.py
 
 # show the created schema
 echo show schemas created in my_database
@@ -38,3 +41,12 @@ python ../schema/show_schemas.py
 echo create a new table with the name of my_table
 python ../table/create_table.py
 
+# describe the table
+echo describe the table
+python ../table/describe_table.py
+
+# show the tables in my_database, should return 2 tables
+python ../table/show_tables.py
+
+# insert data into my_schema.my_table
+python ../table/insert.py
