@@ -4,7 +4,7 @@ import json
 import requests
 import collections
 import urllib
-from exception import DLException
+from .exception import DLException
 from requests.auth import HTTPBasicAuth
 
 class DLClient(object):

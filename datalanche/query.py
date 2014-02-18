@@ -48,7 +48,7 @@ class DLQuery(object):
     #
     def expr(self, *args):
         # *args is a built-in Python variable which is a tuple of function args
-        return { '$expr': list(*args) }
+        return { '$expr': list(args) }
 
     def alias(self, alias_name):
         return { '$alias': alias_name }
@@ -74,28 +74,28 @@ class DLQuery(object):
     # q.func("$count", "*")
     # q.func("$sum", q.column("c1"))
     #
-    def func(self):
-        return { '$function': list(*args) }
+    def func(self, *args):
+        return { '$function': list(args) }
 
-    def avg(self):
-        args = [ '$avg' ] + list(*args)
-        return { '$function': args }
+    def avg(self, *args):
+        temp_args = [ '$avg' ] + list(args)
+        return { '$function': temp_args }
 
-    def count(self):
-        args = [ '$count' ] + list(*args)
-        return { '$function': args }
+    def count(self, *args):
+        temp_args = [ '$count' ] + list(args)
+        return { '$function': temp_args }
 
-    def max(self):
-        args = [ '$max' ] + list(*args)
-        return { '$function': args }
+    def max(self, *args):
+        temp_args = [ '$max' ] + list(args)
+        return { '$function': temp_args }
 
-    def min(self):
-        args = [ '$min' ] + list(*args)
-        return { '$function': args }
+    def min(self, *args):
+        temp_args = [ '$min' ] + list(args)
+        return { '$function': temp_args }
 
-    def sum(self):
-        args = [ '$sum' ] + list(*args)
-        return { '$function': args }
+    def sum(self, *args):
+        temp_args = [ '$sum' ] + list(args)
+        return { '$function': temp_args }
 
     #
     # ALTER DATABASE
