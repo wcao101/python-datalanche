@@ -23,9 +23,8 @@ try:
     
     client = DLClient(key = YOUR_API_KEY, secret = YOUR_API_SECRET)
 
-
     q = DLQuery(database='my_database')
-    q.select([ 'col1', 'col2' ])
+    q.select_all()
     q.distinct(True)
     q.from_tables('my_schema.my_table')
     q.where(q.expr(q.column('col3'), '$like', '%hello%'))
