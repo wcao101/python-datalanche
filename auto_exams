@@ -26,5 +26,5 @@
 #cd ../table
 #python create_table.py
 #python describe_table.py
-python show_tables.py
+python ./examples/table/show_tables.py
 #python insert.py
