@@ -3,12 +3,13 @@
 # Show all tables you have access to.
 #
 import json
-from datalanche import *
+import os
 import sys
+from datalanche import *
 
 try:
 
-    config = json.load(open("../config.json"))
+    config = json.load(open(os.path.dirname(os.path.realpath(__file__)) + '/../config.json'))
 
     # Please find your API credentials here: https://www.datalanche.com/account before use            
     YOUR_API_KEY = config['api_key']
