@@ -6,10 +6,11 @@ machine:
 
   # Version of python to use
   python:
-    version: 2.7.5
+    version: 2.7.3
 
   # setup the right setup_tools for installing datalanche
-  #post:
+  post:
+    - python --version
   #  - wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
   #  - python ez_setup.py --user ubuntu
 
