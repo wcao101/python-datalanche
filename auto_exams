@@ -2,15 +2,15 @@
 
 echo Make sure the previous database's name is changed back to my_database
 # make sure the previous database's name is changed back to my_database
-curl --verbose -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"alter_database":"my_new_database","rename_to":"my_database"}' "https://api.datalanche.com/query"
+curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"alter_database":"my_new_database","rename_to":"my_database"}' "https://api.datalanche.com/query"
 
 echo make sure previous schemas are cleaned up before examples testing
 # make sure previous schemas are cleaned up before examples testing
-curl --verbose -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
+curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
 
 echo make sure the previous alterred schemas are cleaned up before examples testing
 # make sure the previous alterred schemas are cleaned up before examples testing
-curl --verbose -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_new_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
+curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_new_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
 
 echo schema examples...
 
