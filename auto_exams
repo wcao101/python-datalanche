@@ -1,5 +1,7 @@
 #!/bin/bash
 
+host api.datalanche.com
+
 echo Make sure the previous database's name is changed back to my_database
 # make sure the previous database's name is changed back to my_database
 curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"alter_database":"my_new_database","rename_to":"my_database"}' "https://api.datalanche.com/query"
