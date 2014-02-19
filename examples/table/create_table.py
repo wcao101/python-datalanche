@@ -36,7 +36,7 @@ try:
         },
         'col2': {
             'data_type': {
-                'name': 'varchar',
+                'name': 'timestamptz',
                 'args': [ 50 ]
             },
             'description': 'col2 description text',
@@ -45,12 +45,21 @@ try:
         },
         'col3': {
             'data_type': {
-                'name': 'integer'
+                'name': 'text'
             },
             'description': 'col3 description text',
             'default_value': 0,
             'not_null': True
-        }
+        },
+        'col4': {
+            'data_type': {
+                'name': 'varchar',
+                'args': [ 50 ]
+            },
+            'description': 'col4 description text',
+            'default_value': None,
+            'not_null': False
+        },
     })
 
     client.query(q)

@@ -2,29 +2,84 @@
 
 #host api.datalanche.com
 
-#echo Make sure the previous database's name is changed back to my_database
+# cd into the examples/schema subdirectory to match the config.json on the example
+# file
+cd ./examples/schema
+
+echo
+echo Make sure the previous databases name is changed back to my_database
 # make sure the previous database's name is changed back to my_database
-#curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"alter_database":"my_new_database","rename_to":"my_database"}' "https://api.datalanche.com/query"
-
-#echo make sure previous schemas are cleaned up before examples testing
+curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "alter_database": "my_new_database",
+                        "rename_to": "my_database"
+                      }' 
+echo
+echo make sure previous schemas are cleaned up before examples testing
 # make sure previous schemas are cleaned up before examples testing
-#curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
-
-#echo make sure the previous alterred schemas are cleaned up before examples testing
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_schema",
+                        "cascade": true
+                      }'
+echo
+echo make sure the previous alterred schemas are cleaned up before examples testing
 # make sure the previous alterred schemas are cleaned up before examples testing
-#curl --verbose --connect-timeout 10 -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{"drop_schema":"my_new_schema","cascade":true}' "https://api.datalanche.com/my_database/query"
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_new_schema",
+                        "cascade": true
+                      }'
 
-#echo schema examples...
+# schema examples
+# create a schema
+echo
+echo create a schema
+python ../schema/create_schema.py
 
-#cd ./examples/schema
-#python create_schema.py
-#python describe_schema.py
-#python show_schemas.py
+# describe the schema
+echo
+echo describe the schema
+python ../schema/describe_schema.py
 
-#echo table examples...
+# show the created schema
+echo
+echo show schemas created in my_database
+python ../schema/show_schemas.py
 
-#cd ../table
-#python create_table.py
-#python describe_table.py
-python ./examples/table/show_tables.py
-#python insert.py
+# table examples
+# create a table
+echo
+echo testing creation of a new table with the name of my_table
+python ../table/create_table.py
+
+# describe the table
+echo
+echo testing description of the table
+python ../table/describe_table.py
+
+# show the tables in my_database, should return 2 tables
+echo
+echo testing showing the created tables
+python ../table/show_tables.py
+
+# insert data into my_schema.my_table
+echo
+echo testing insertion of the values into my_table
+python ../table/insert.py
+
+# testing select example
+echo
+echo testing select all example
+python ../table/select_all.py
+
+# testing select_search example
+echo
+echo testing select search example
+python ../table/select_search.py
+
+# create sample tables for select_joint
+sh ../../create_sample_tables
+
+# testing select_join example
+echo
+echo testing select join example
+python ../table/select_join.py
+

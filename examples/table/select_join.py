@@ -24,9 +24,9 @@ try:
     q = DLQuery(database='my_database')
     q.select_all()
     q.from_tables(q.expr(
-        q.table('t1'),
-        '$join', q.table('t2'), '$on', q.column('t1.c1'), '=', q.column('t2.c1'),
-        '$join', q.table('t3'), '$on', q.column('t1.c1'), '=', q.column('t3.c1')
+        q.table('my_schema.t1'),
+        '$join', q.table('my_schema.t2'), '$on', q.column('my_schema.t1.col1'), '=', q.column('my_schema.t2.col1'),
+        '$join', q.table('my_schema.t3'), '$on', q.column('my_schema.t1.col1'), '=', q.column('my_schema.t3.col1')
     ))
 
     result = client.query(q)
