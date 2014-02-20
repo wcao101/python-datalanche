@@ -17,6 +17,11 @@ machine:
   #  - wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
   #  - python ez_setup.py --user ubuntu
 
+dependencies:
+  override:
+    - python2.7 setup.py install
+
+
 ## Customize test commands
 test:
   override:
