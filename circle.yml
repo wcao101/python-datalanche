@@ -18,6 +18,8 @@ machine:
   #  - python ez_setup.py --user ubuntu
 
 dependencies:
+  pre:
+    - rm -rf /home/ubuntu/python-datalanche/venv/lib/python2.7/site-packages/*datalanche*
   override:
     - python2.7 setup.py install
 
