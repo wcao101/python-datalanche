@@ -14,14 +14,18 @@ from datalanche import *
 import sys
 
 try:
-
     config = json.load(open("../config.json"))
+    config['verify_ssl'] = config['verify_ssl'].lower()
+    if config['verify_ssl'] == '0' or config['verify_ssl'] == 'false':
+        config['verify_ssl'] = False
+    else:
+        config['verify_ssl'] = True
 
-    # Please find your API credentials here: https://www.datalanche.com/account before use            
-    YOUR_API_KEY = config['api_key']
-    YOUR_API_SECRET = config['api_secret']
-    
-    client = DLClient(key = YOUR_API_KEY, secret = YOUR_API_SECRET)
+    client = DLClient(key = config['api_key'], 
+                      secret = config['api_secret'], 
+                      host = config['host'], 
+                      port = config['port'], 
+                      verify_ssl = config['verify_ssl'])
 
     q = DLQuery(database='my_database') 
     q.create_table('my_schema.my_table')
