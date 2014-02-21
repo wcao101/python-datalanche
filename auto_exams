@@ -8,13 +8,13 @@ cd ./examples/schema
 
 # setup the config.json for production_server test
 if [ ! -f ../config.json ]; then \
-    echo  setup the config.json for production_server test \
-    cp ../config/config_production.json ../config.json \
+    echo  setup the config.json for production_server test; \
+    bash -c "cp ../config/config_production ../config.json"; \
 else \ 
-    echo remove the old config.json \
-    rm ../config.json \
-    echo copy the production config.json into example folder
-    cp ../config/config_production.json ../config.json \
+    echo remove the old config.json; \
+    bash -c "rm ../config.json"; \
+    echo copy the production config.json into example folder; \
+    bash -c "cp ../config/config_production ../config.json"; \
 fi \
 
 echo

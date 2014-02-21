@@ -7,13 +7,12 @@ cd ./examples/schema
 
 # setup the config.json for production_server test
 if [ ! -f ../config.json ]; then \
-    echo  setup the config.json for localhost_server test \
-    cp ../config/config_localhost ../config.json \
+echo  setup the config.json for localhost_server test; \
+bash -c "cp ../config/config_localhost ../config.json"; \
 else \ 
-    echo remove the old config.json \
-    rm ../config.json \
-    echo copy the localhost config.json into example folder
-    cp ../config/config_localhost ../config.json \
+echo remove the old config.json \
+bash -c "rm ../config.json"; \
+bash -c "cp ../config/config_localhost ../config.json"; \
 fi \
 
 # for localhost 
@@ -35,4 +34,3 @@ curl https://localhost:4001/my_database/query -k -X POST -u "xeeFjAIlQMi/E+q4uFe
                         "drop_schema": "my_new_schema",
                         "cascade": true
                       }'
-
