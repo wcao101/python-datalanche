@@ -83,3 +83,27 @@ echo
 echo testing select join example
 python ../table/select_join.py
 
+# update my_schema.my_table
+echo
+echo testing updating my_table
+python ../table/update.py
+
+# delete my_schema.my_table
+echo
+echo testing deletion of my_table
+python ../table/delete.py
+
+# alther the table name and the table descriptions
+echo
+echo testing alterring my_table including alterring my_schema to my_new_schema
+python ../table/alter_table.py
+
+# create table again after altering table.
+echo
+echo create table again so as to test droping table
+python ../table/create_table.py
+
+# drop my_schema.my_table
+echo
+echo testing dropping my_table
+python ../table/drop_table.py
