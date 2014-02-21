@@ -57,4 +57,4 @@ try:
 
 except DLException as e:
     print repr(e)
-    sys.exit(1)
+    return 1
