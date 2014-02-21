@@ -120,49 +120,75 @@ echo testing dropping my_table
 python ../table/drop_table.py
 
 
-
-
-# alter the schema back to my_schema from my_new_schema set by alter_table.py
-curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
-                              "alter_schema": "my_new_schema",
-                              "rename_to": "my_schema",
-                              "description": "A new, optional description of renamed_schema."
-                           }' "https://api.datalanche.com/my_database/query"
+echo
+echo drop the schema: my_new_schema before testing alter_schema example
+#echo drop the schema: my_new_schema before testing alter_schema example
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+"drop_schema": "my_new_schema",
+"cascade": true
+}'
 
 # alter my_schema to my_new_schema
+echo
+echo alter the schema from my_schema to my_new_schema
 python ../schema/alter_schema.py
 
 # show schema which should show my_new_schema
-python ../schema/show_schema.py
+echo
+echo testing show schema for making sure schema is alterred.
+python ../schema/show_schemas.py
 
+#create the schema again to test drop schema.
+echo
+echo create schema again to test dropping schema
+python ../schema/create_schema.py
+
+# show schema which should show my_schema and my_new_schema
+echo
+echo make sure my_schema is existed.
+python ../schema/show_schemas.py
 
 # drop my_schema
+echo
+echo testing droping schema
 python ../schema/drop_schema.py
 
-# drop the alterred schema resulted by alter_schema.py and cleaning schema
-curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
-                              "drop_schema": "my_new_schema",
-                              "cascade": true
-                           }'  "https://api.datalanche.com/my_database/query"
-  
+# show schema which should show new_schema only
+echo
+echo testing show schema for making sure my_schema is dropped.
+python ../schema/show_schemas.py
+
+
 # database examples
 # describe the database
+echo
+echo testing describe database
 python ../database/describe_database.py
 
 # show the database
-python ../database/show_database.py
+echo
+echo testing showing database
+python ../database/show_databases.py
 
 # alther the database
+echo
+echo testing altering database
 python ../database/alter_database.py
 
 # show the database after altered
-python ../database/show_database.py
+echo
+echo testing show database, should display my_new_database
+python ../database/show_databases.py
 
 # alter the my_new_database to my_database
-curl -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
-                              "alter_database": "my_new_database",
-                              "rename_to": "my_database"
-                             }' "https://api.datalanche.com/my_database/query"
+echo
+echo  alter the my_new_database to my_database
+curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+"alter_database": "my_new_database",
+"rename_to": "my_database"
+}'
 
 # show the database to check if the database is altered back to my_database
-python ../database/show_database.py
+echo
+echo Make sure the name of my_new_database is changed back to my_database
+python ../database/show_databases.py
