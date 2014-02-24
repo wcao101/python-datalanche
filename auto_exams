@@ -8,13 +8,13 @@ cd ./examples/schema
 
 # setup the config.json for production_server test
 if [ ! -f ../config.json ]; then \
-    echo  setup the config.json for production_server test; \
-    bash -c "cp ../config/config_production ../config.json"; \
-else \ 
-    echo remove the old config.json; \
-    bash -c "rm ../config.json"; \
-    echo copy the production config.json into example folder; \
-    bash -c "cp ../config/config_production ../config.json"; \
+echo  setup the config.json for production_server test; \
+bash -c "cp ../config/config_production ../config.json"; \
+else 
+echo remove the old config.json; \
+bash -c "rm ../config.json"; \
+echo copy the production config.json into example folder; \
+bash -c "cp ../config/config_production ../config.json"; \
 fi \
 
 echo
@@ -94,6 +94,46 @@ echo
 echo testing select join example
 python ../table/select_join.py
 
+# create index on my_schema.my_table
+echo
+echo testing creation of index on my_schema.my_table
+python ../index/create_index.py
+
+# show the tables with index
+echo
+echo testing show tables with created index
+python ../table/describe_table.py
+
+# drop index on my_schema.my_table
+echo
+echo testing dropping of index on my_schema.my_table
+python ../index/drop_index.py
+
+# show the tables with dropped index
+echo
+echo testing show tables with dropped index
+python ../table/describe_table.py
+
+# create index on my_schema.my_table again for testing alterring index
+echo
+echo testing creation of index on my_schema.my_table again testing alterring index
+python ../index/create_index.py
+
+# show the tables with index
+echo
+echo testing show tables with created index before alterring index
+python ../table/describe_table.py
+
+# alter index on my_schema.my_table
+echo
+echo testing alterring of index on my_schema.my_table
+python ../index/alter_index.py
+
+# show the tables with alterred index
+echo
+echo testing show tables with alterred index
+python ../table/describe_table.py
+
 # update my_schema.my_table
 echo
 echo testing updating my_table
@@ -114,10 +154,20 @@ echo
 echo create table again so as to test droping table
 python ../table/create_table.py
 
+# show table to make sure the new table is created before drop
+echo
+echo show table to make sure the new table is created before drop
+python ../table/show_tables.py
+
 # drop my_schema.my_table
 echo
 echo testing dropping my_table
 python ../table/drop_table.py
+
+# show table to make sure the new table is created before drop
+echo
+echo show table to make sure the new table is created before drop
+python ../table/show_tables.py
 
 
 echo
