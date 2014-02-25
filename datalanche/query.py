@@ -169,10 +169,14 @@ class DLQuery(object):
         self.params['alter_columns'][column_name] = attributes
         return self # method chaining
 
-    def drop_column(self, column_name):
+    def drop_column(self, column_name, cascade = False):
         if 'drop_columns' not in self.params:
             self.params['drop_columns'] = list()
-        self.params['drop_columns'].append(column_name)
+
+        column_obj = collections.OrderedDict()
+        column_obj['name'] = column_name
+        column_obj['cascade'] = cascade
+        self.params['drop_columns'].append(column_obj)
         return self # method chaining
 
     # TODO: drop_constraint

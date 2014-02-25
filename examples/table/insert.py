@@ -29,17 +29,20 @@ try:
         {
             'col1': '0f21b968-cd28-4d8b-9ea6-33dbcd517ec5',
             'col2': '2012-11-13T01:04:33.389Z',
-            'col3': 'Hello'
+            'col3': 'Hello',
+            'col4': 'Ohio'
         },
         {
             'col1': '8bf38716-95ef-4a58-9c1b-b7c0f3185746',
             'col2': '2012-07-26T01:09:04.140Z',
-            'col3': 'World'
+            'col3': 'World',
+            'col4': 'California'
         },
         {
             'col1': '45db0793-3c99-4e0d-b1d0-43ab875638d3',
             'col2': '2012-11-30T07:10:36.871Z',
-            'col3': 'Hello World'
+            'col3': 'Hello World',
+            'col4': 'Colorado'
         }
     ])
 
