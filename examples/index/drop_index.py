@@ -20,7 +20,7 @@ try:
     client = DLClient(key = YOUR_API_KEY, secret = YOUR_API_SECRET)
 
     q = DLQuery(database='my_database')
-    q.create_index('my_index')
+    q.drop_index('my_schema.my_index')
     q.cascade(True)
 
     client.query(q)
