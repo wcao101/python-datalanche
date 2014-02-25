@@ -4,7 +4,7 @@
 
 # cd into the examples/schema subdirectory to match the config.json on the example
 # file
-cd ./examples/schema
+cd ../examples/schema
 
 # setup the config.json for production_server test
 if [ ! -f ../config.json ]; then \
