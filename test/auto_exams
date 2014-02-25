@@ -76,7 +76,7 @@ echo testing select search example
 python ../table/select_search.py
 
 # create sample tables for select_joint
-sh ../../create_sample_tables
+sh ../../test/create_sample_tables
 
 # testing select_join example
 echo
