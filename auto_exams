@@ -1,0 +1,233 @@
+#!/bin/bash
+
+#host api.datalanche.com
+
+# cd into the examples/schema subdirectory to match the config.json on the example
+# file
+cd ../examples/schema
+
+echo
+echo Make sure the previous databases name is changed back to my_database
+# make sure the previous database's name is changed back to my_database
+curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "alter_database": "my_new_database",
+                        "rename_to": "my_database"
+                      }' 
+echo
+echo make sure previous schemas are cleaned up before examples testing
+# make sure previous schemas are cleaned up before examples testing
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_schema",
+                        "cascade": true
+                      }'
+echo
+echo make sure the previous alterred schemas are cleaned up before examples testing
+# make sure the previous alterred schemas are cleaned up before examples testing
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "drop_schema": "my_new_schema",
+                        "cascade": true
+                      }'
+
+# schema examples
+# create a schema
+echo
+echo create a schema
+python ../schema/create_schema.py
+
+# describe the schema
+echo
+echo describe the schema
+python ../schema/describe_schema.py
+
+# show the created schema
+echo
+echo show schemas created in my_database
+python ../schema/show_schemas.py
+
+# table examples
+# create a table
+echo
+echo testing creation of a new table with the name of my_table
+python ../table/create_table.py
+
+# describe the table
+echo
+echo testing description of the table
+python ../table/describe_table.py
+
+# show the tables in my_database, should return 2 tables
+echo
+echo testing showing the created tables
+python ../table/show_tables.py
+
+# insert data into my_schema.my_table
+echo
+echo testing insertion of the values into my_table
+python ../table/insert.py
+
+# testing select example
+echo
+echo testing select all example
+python ../table/select_all.py
+
+# testing select_search example
+echo
+echo testing select search example
+python ../table/select_search.py
+
+# create sample tables for select_joint
+sh ../../test/create_sample_tables
+
+# testing select_join example
+echo
+echo testing select join example
+python ../table/select_join.py
+
+# create index on my_schema.my_table
+echo
+echo testing creation of index on my_schema.my_table
+python ../index/create_index.py
+
+# show the tables with index
+echo
+echo testing show tables with created index
+python ../table/describe_table.py
+
+# drop index on my_schema.my_table
+echo
+echo testing dropping of index on my_schema.my_table
+python ../index/drop_index.py
+
+# show the tables with dropped index
+echo
+echo testing show tables with dropped index
+python ../table/describe_table.py
+
+# create index on my_schema.my_table again for testing alterring index
+echo
+echo testing creation of index on my_schema.my_table again testing alterring index
+python ../index/create_index.py
+
+# show the tables with index
+echo
+echo testing show tables with created index before alterring index
+python ../table/describe_table.py
+
+# alter index on my_schema.my_table
+echo
+echo testing alterring of index on my_schema.my_table
+python ../index/alter_index.py
+
+# show the tables with alterred index
+echo
+echo testing show tables with alterred index
+python ../table/describe_table.py
+
+# update my_schema.my_table
+echo
+echo testing updating my_table
+python ../table/update.py
+
+# delete my_schema.my_table
+echo
+echo testing deletion of my_table
+python ../table/delete.py
+
+# alther the table name and the table descriptions
+echo
+echo testing alterring my_table including alterring my_schema to my_new_schema
+python ../table/alter_table.py
+
+# create table again after altering table.
+echo
+echo create table again so as to test droping table
+python ../table/create_table.py
+
+# show table to make sure the new table is created before drop
+echo
+echo show table to make sure the new table is created before drop
+python ../table/show_tables.py
+
+# drop my_schema.my_table
+echo
+echo testing dropping my_table
+python ../table/drop_table.py
+
+# show table to make sure the new table is created before drop
+echo
+echo show table to make sure the new table is created before drop
+python ../table/show_tables.py
+
+
+echo
+echo drop the schema: my_new_schema before testing alter_schema example
+#echo drop the schema: my_new_schema before testing alter_schema example
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+"drop_schema": "my_new_schema",
+"cascade": true
+}'
+
+# alter my_schema to my_new_schema
+echo
+echo alter the schema from my_schema to my_new_schema
+python ../schema/alter_schema.py
+
+# show schema which should show my_new_schema
+echo
+echo testing show schema for making sure schema is alterred.
+python ../schema/show_schemas.py
+
+#create the schema again to test drop schema.
+echo
+echo create schema again to test dropping schema
+python ../schema/create_schema.py
+
+# show schema which should show my_schema and my_new_schema
+echo
+echo make sure my_schema is existed.
+python ../schema/show_schemas.py
+
+# drop my_schema
+echo
+echo testing droping schema
+python ../schema/drop_schema.py
+
+# show schema which should show new_schema only
+echo
+echo testing show schema for making sure my_schema is dropped.
+python ../schema/show_schemas.py
+
+
+# database examples
+# describe the database
+echo
+echo testing describe database
+python ../database/describe_database.py
+
+# show the database
+echo
+echo testing showing database
+python ../database/show_databases.py
+
+# alther the database
+echo
+echo testing altering database
+python ../database/alter_database.py
+
+# show the database after altered
+echo
+echo testing show database, should display my_new_database
+python ../database/show_databases.py
+
+# alter the my_new_database to my_database
+echo
+echo  alter the my_new_database to my_database
+curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+"alter_database": "my_new_database",
+"rename_to": "my_database"
+}'
+
+# show the database to check if the database is altered back to my_database
+echo
+echo Make sure the name of my_new_database is changed back to my_database
+python ../database/show_databases.py

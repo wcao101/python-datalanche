@@ -6,9 +6,9 @@ all: pre_test test post_test
 pre_test: # setup the production server
 	sh pre
 
-test: # run examples test
+test: schema table selects index alter_schema database # run examples test
 	
-	
+schema:
 	# schema examples
 	# create a schema
 	echo
@@ -25,6 +25,7 @@ test: # run examples test
 	echo show schemas created in my_database
 	python ../examples/schema/show_schemas.py
 
+table:
 	# table examples
 	# create a table
 	echo
@@ -46,6 +47,45 @@ test: # run examples test
 	echo testing insertion of the values into my_table
 	python ../examples/table/insert.py
 
+	# update my_schema.my_table
+	echo
+	echo testing updating my_table
+	python ../examples/table/update.py
+
+	# delete my_schema.my_table
+	echo
+	echo testing deletion of my_table
+	python ../examples/table/delete.py
+
+	# alther the table name and the table descriptions
+	echo
+	echo testing alterring my_table including alterring my_schema to my_new_schema
+	python ../examples/table/alter_table.py
+
+	# create table again after altering table.
+	echo
+	echo create table again so as to test droping table
+	python ../examples/table/create_table.py
+
+	# show table to make sure the new table is created before drop
+	echo
+	echo show table to make sure the new table is created before drop
+	python ../examples/table/show_tables.py
+
+	# drop my_schema.my_table
+	echo
+	echo testing dropping my_table
+	python ../examples/table/drop_table.py
+
+	# show table to make sure the new table is created before drop
+	echo
+	echo show table to make sure the new table is created before drop
+	python ../examples/table/show_tables.py
+
+selects:
+	# create sample tables for selects
+	sh create_sample_tables
+
 	# testing select example
 	echo
 	echo testing select all example
@@ -56,14 +96,12 @@ test: # run examples test
 	echo testing select search example
 	python ../examples/table/select_search.py
 
-	# create sample tables for select_joint
-	sh ../examples/../examples/test/create_sample_tables
-
 	# testing select_join example
 	echo
 	echo testing select join example
 	python ../examples/table/select_join.py
 
+index:
 	# create index on my_schema.my_table
 	echo
 	echo testing creation of index on my_schema.my_table
@@ -104,45 +142,10 @@ test: # run examples test
 	echo testing show tables with alterred index
 	python ../examples/table/describe_table.py
 
-	# update my_schema.my_table
-	echo
-	echo testing updating my_table
-	python ../examples/table/update.py
-
-	# delete my_schema.my_table
-	echo
-	echo testing deletion of my_table
-	python ../examples/table/delete.py
-
-	# alther the table name and the table descriptions
-	echo
-	echo testing alterring my_table including alterring my_schema to my_new_schema
-	python ../examples/table/alter_table.py
-
-	# create table again after altering table.
-	echo
-	echo create table again so as to test droping table
-	python ../examples/table/create_table.py
-
-	# show table to make sure the new table is created before drop
-	echo
-	echo show table to make sure the new table is created before drop
-	python ../examples/table/show_tables.py
-
-	# drop my_schema.my_table
-	echo
-	echo testing dropping my_table
-	python ../examples/table/drop_table.py
-
-	# show table to make sure the new table is created before drop
-	echo
-	echo show table to make sure the new table is created before drop
-	python ../examples/table/show_tables.py
-
-
+alter_schema:
+	#echo drop the schema: my_new_schema before testing alter_schema example
 	echo
 	echo drop the schema: my_new_schema before testing alter_schema example
-	#echo drop the schema: my_new_schema before testing alter_schema example
 	curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
 	"drop_schema": "my_new_schema",
 	"cascade": true
@@ -178,7 +181,7 @@ test: # run examples test
 	echo testing show schema for making sure my_schema is dropped.
 	python ../examples/schema/show_schemas.py
 
-
+database:
 	# database examples
 	# describe the database
 	echo
