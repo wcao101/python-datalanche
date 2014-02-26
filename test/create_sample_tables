@@ -1,17 +1,12 @@
 #!/bin/bash
 
-# cd into the examples/table directory
-echo
-echo cd into the examples/table directory
-cd ../examples/table
-
 echo
 echo create a new table with the name of my_table
-python ../table/create_table.py
+python ../examples/table/create_table.py
 
 echo
 echo insert data into my_table
-python ../table/insert.py
+python ../examples/table/insert.py
 
 echo rename the table my_table to t1
 # make sure the previous alterred schemas are cleaned up before examples testing
@@ -22,11 +17,11 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
 
 echo
 echo create a new table with the name of my_table
-python ../table/create_table.py
+python ../examples/table/create_table.py
 
 echo
 echo insert data into my_table
-python ../table/insert.py
+python ../examples/table/insert.py
 
 echo rename the table my_table to t2
 # make sure the previous alterred schemas are cleaned up before examples testing
@@ -37,11 +32,11 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
 
 echo
 echo create a new table with the name of my_table
-python ../table/create_table.py
+python ../examples/table/create_table.py
 
 echo
 echo insert data into my_table
-python ../table/insert.py
+python ../examples/table/insert.py
 
 echo
 echo rename the table my_table to t3
@@ -61,8 +56,8 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
 
 echo
 echo create a new table with the name of my_table
-python ../table/create_table.py
+python ../examples/table/create_table.py
 
 echo
 echo insert data into my_table
-python ../table/insert.py
+python ../examples/table/insert.py

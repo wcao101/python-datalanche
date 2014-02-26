@@ -23,3 +23,10 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
                         "drop_schema": "my_new_schema",
                         "cascade": true
                       }'
+
+echo
+echo create a plain new schema
+# create a plain new schema
+curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
+                        "create_schema": "my_new_schema"
+                        }'
