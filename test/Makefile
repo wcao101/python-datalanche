@@ -57,6 +57,10 @@ table:
 	echo testing deletion of my_table
 	python ../examples/table/delete.py
 
+	echo
+	echo create new schema
+
+
 	# alther the table name and the table descriptions
 	echo
 	echo testing alterring my_table including alterring my_schema to my_new_schema
@@ -146,10 +150,8 @@ alter_schema:
 	#echo drop the schema: my_new_schema before testing alter_schema example
 	echo
 	echo drop the schema: my_new_schema before testing alter_schema example
-	curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
-	"drop_schema": "my_new_schema",
-	"cascade": true
-	}'
+	curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" 
+	-d '{ "drop_schema": "my_new_schema", "cascade": true }'
 
 	# alter my_schema to my_new_schema
 	echo
