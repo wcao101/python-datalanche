@@ -23,7 +23,7 @@ try:
     q.create_index('my_index')
     q.unique(True)
     q.on_table('my_schema.my_table')
-    q.method('btree')
+    q.using_method('btree')
     q.columns([ 'col1', 'col2' ])
 
     client.query(q)

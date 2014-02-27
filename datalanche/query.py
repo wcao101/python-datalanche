@@ -201,16 +201,16 @@ class DLQuery(object):
         self.params['create_index'] = index_name
         return self # method chaining
 
-    def method(self, text):
-        self.params['method'] = text
-        return self # method chaining
-
     def on_table(self, tableName):
         self.params['on_table'] = tableName
         return self # method chaining
 
     def unique(self, boolean):
         self.params['unique'] = boolean
+        return self # method chaining
+
+    def using_method(self, text):
+        self.params['using_method'] = text
         return self # method chaining
 
     #
