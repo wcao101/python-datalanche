@@ -1,7 +1,7 @@
 
 #host api.datalanche.com
 
-all: pre_test test post_test
+all: pre_test test
 
 pre_test: # setup the production server
 	sh pre
@@ -56,10 +56,6 @@ table:
 	echo
 	echo testing deletion of my_table
 	python ../examples/table/delete.py
-
-	echo
-	echo create new schema
-
 
 	# alther the table name and the table descriptions
 	echo
@@ -150,7 +146,9 @@ alter_schema:
 	#echo drop the schema: my_new_schema before testing alter_schema example
 	echo
 	echo drop the schema: my_new_schema before testing alter_schema example
-	curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" 
+	curl https://api.datalanche.com/my_database/query -X POST \
+	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
+	-H "Content-Type: application/json" \
 	-d '{ "drop_schema": "my_new_schema", "cascade": true }'
 
 	# alter my_schema to my_new_schema
@@ -208,10 +206,10 @@ database:
 	# alter the my_new_database to my_database
 	echo
 	echo  alter the my_new_database to my_database
-	curl https://api.datalanche.com/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -d '{
-	"alter_database": "my_new_database",
-	"rename_to": "my_database"
-	}'
+	curl https://api.datalanche.com/query -X POST \
+	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
+	-H "Content-Type: application/json" \
+	-d '{ "alter_database": "my_new_database", "rename_to": "my_database"}'
 
 	# show the database to check if the database is altered back to my_database
 	echo
