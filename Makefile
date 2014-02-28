@@ -1,14 +1,13 @@
 
 #host api.datalanche.com
 
-all: pre_test test
+all: target
 
-pre_test: # setup the production server
-	sh ./test/pre
+target:  test
 
-test: schema table selects index alter_schema database # run examples test
+test: pre_test test_schema test_table test_selects test_index test_alter_schema test_database # run examples test
 	
-schema:
+test_schema: pre_test
 	# schema examples
 	# create a schema
 	python ./examples/schema/create_schema.py
@@ -19,7 +18,7 @@ schema:
 	# show the created schema
 	python ./examples/schema/show_schemas.py
 
-table:
+test_table: test_schema
 	# table examples
 	# create a table
 	python ./examples/table/create_table.py
@@ -54,7 +53,7 @@ table:
 	# show table to make sure the new table is created before drop
 	python ./examples/table/show_tables.py
 
-selects:
+test_selects: test_schema
 	# create sample tables for selects
 	sh ./test/create_sample_tables
 
@@ -67,7 +66,7 @@ selects:
 	# testing select_join example
 	python ./examples/table/select_join.py
 
-index:
+test_index: test_selects
 	# create index on my_schema.my_table
 	python ./examples/index/create_index.py
 
@@ -92,7 +91,7 @@ index:
 	# show the tables with alterred index
 	python ./examples/table/describe_table.py
 
-alter_schema:
+test_alter_schema: test_schema
 	#echo drop the schema: my_new_schema before testing alter_schema example
 	curl https://api.datalanche.com/my_database/query -X POST \
 	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
@@ -117,7 +116,7 @@ alter_schema:
 	# show schema which should show new_schema only
 	python ./examples/schema/show_schemas.py
 
-database:
+test_database:
 	# database examples
 	# describe the database
 	python ./examples/database/describe_database.py
@@ -139,3 +138,7 @@ database:
 
 	# show the database to check if the database is altered back to my_database
 	python ./examples/database/show_databases.py
+
+pre_test: # setup the production server
+	sh ./test/pre
+
