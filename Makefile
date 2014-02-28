@@ -1,6 +1,10 @@
+API_CREDENTIALS =  GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==
+DB_QUERY_URL = https://api.datalanche.com/my_database/query 
+QUERY_URL = https://api.datalanche.com/query 
+CURL_OPTS_DROP_SCHEMA = -X POST -u "$(API_CREDENTIALS)" -H "Content-Type: application/json" -d '{ "drop_schema": "my_new_schema", "cascade": true }'
+CURL_OPTS_ALTER_DATABASE = -X POST -u "$(API_CREDENTIALS)" -H "Content-Type: application/json" -d '{ "alter_database": "my_new_database", "rename_to": "my_database"}'
 
 #host api.datalanche.com
-
 all: target
 
 target:  test
@@ -93,10 +97,7 @@ test_index: test_selects
 
 test_alter_schema: test_schema
 	#echo drop the schema: my_new_schema before testing alter_schema example
-	curl https://api.datalanche.com/my_database/query -X POST \
-	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
-	-H "Content-Type: application/json" \
-	-d '{ "drop_schema": "my_new_schema", "cascade": true }'
+	curl $(DB_QUERY_URL) $(CURL_OPTS_DROP_SCHEMA)
 
 	# alter my_schema to my_new_schema
 	python ./examples/schema/alter_schema.py
@@ -131,10 +132,7 @@ test_database:
 	python ./examples/database/show_databases.py
 
 	# alter the my_new_database to my_database
-	curl https://api.datalanche.com/query -X POST \
-	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
-	-H "Content-Type: application/json" \
-	-d '{ "alter_database": "my_new_database", "rename_to": "my_database"}'
+	curl $(QUERY_URL) $(CURL_OPTS_ALTER_DATABASE)
 
 	# show the database to check if the database is altered back to my_database
 	python ./examples/database/show_databases.py
