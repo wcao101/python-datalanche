@@ -11,7 +11,7 @@ import sys
 
 try:
 
-    config = json.load(open("../examples/config.json"))
+    config = json.load(open("./examples/config.json"))
 
     # Please find your API credentials here: https://www.datalanche.com/account before use            
     YOUR_API_KEY = config['api_key']

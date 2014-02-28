@@ -1,0 +1,141 @@
+
+#host api.datalanche.com
+
+all: pre_test test
+
+pre_test: # setup the production server
+	sh ./test/pre
+
+test: schema table selects index alter_schema database # run examples test
+	
+schema:
+	# schema examples
+	# create a schema
+	python ./examples/schema/create_schema.py
+
+	# describe the schema
+	python ./examples/schema/describe_schema.py
+
+	# show the created schema
+	python ./examples/schema/show_schemas.py
+
+table:
+	# table examples
+	# create a table
+	python ./examples/table/create_table.py
+
+	# describe the table
+	python ./examples/table/describe_table.py
+
+	# show the tables in my_database, should return 2 tables
+	python ./examples/table/show_tables.py
+
+	# insert data into my_schema.my_table
+	python ./examples/table/insert.py
+
+	# update my_schema.my_table
+	python ./examples/table/update.py
+
+	# delete my_schema.my_table
+	python ./examples/table/delete.py
+
+	# alther the table name and the table descriptions
+	python ./examples/table/alter_table.py
+
+	# create table again after altering table.
+	python ./examples/table/create_table.py
+
+	# show table to make sure the new table is created before drop
+	python ./examples/table/show_tables.py
+
+	# drop my_schema.my_table
+	python ./examples/table/drop_table.py
+
+	# show table to make sure the new table is created before drop
+	python ./examples/table/show_tables.py
+
+selects:
+	# create sample tables for selects
+	sh ./test/create_sample_tables
+
+	# testing select example
+	python ./examples/table/select_all.py
+
+	# testing select_search example
+	python ./examples/table/select_search.py
+
+	# testing select_join example
+	python ./examples/table/select_join.py
+
+index:
+	# create index on my_schema.my_table
+	python ./examples/index/create_index.py
+
+	# show the tables with index
+	python ./examples/table/describe_table.py
+
+	# drop index on my_schema.my_table
+	python ./examples/index/drop_index.py
+
+	# show the tables with dropped index
+	python ./examples/table/describe_table.py
+
+	# create index on my_schema.my_table again for testing alterring index
+	python ./examples/index/create_index.py
+
+	# show the tables with index
+	python ./examples/table/describe_table.py
+
+	# alter index on my_schema.my_table
+	python ./examples/index/alter_index.py
+
+	# show the tables with alterred index
+	python ./examples/table/describe_table.py
+
+alter_schema:
+	#echo drop the schema: my_new_schema before testing alter_schema example
+	curl https://api.datalanche.com/my_database/query -X POST \
+	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
+	-H "Content-Type: application/json" \
+	-d '{ "drop_schema": "my_new_schema", "cascade": true }'
+
+	# alter my_schema to my_new_schema
+	python ./examples/schema/alter_schema.py
+
+	# show schema which should show my_new_schema
+	python ./examples/schema/show_schemas.py
+
+	#create the schema again to test drop schema.
+	python ./examples/schema/create_schema.py
+
+	# show schema which should show my_schema and my_new_schema
+	python ./examples/schema/show_schemas.py
+
+	# drop my_schema
+	python ./examples/schema/drop_schema.py
+
+	# show schema which should show new_schema only
+	python ./examples/schema/show_schemas.py
+
+database:
+	# database examples
+	# describe the database
+	python ./examples/database/describe_database.py
+
+	# show the database
+	python ./examples/database/show_databases.py
+
+	# alther the database
+	python ./examples/database/alter_database.py
+
+	# show the database after altered
+	python ./examples/database/show_databases.py
+
+	# alter the my_new_database to my_database
+	curl https://api.datalanche.com/query -X POST \
+	-u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" \
+	-H "Content-Type: application/json" \
+	-d '{ "alter_database": "my_new_database", "rename_to": "my_database"}'
+
+	# show the database to check if the database is altered back to my_database
+	python ./examples/database/show_databases.py
