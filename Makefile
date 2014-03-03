@@ -140,3 +140,4 @@ test_database:
 pre_test: # setup the production server
 	sh ./test/pre
 
+.PHONY: test test_schema test_tables test_database test_
