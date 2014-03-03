@@ -9,7 +9,7 @@ from datalanche import *
 
 try:
 
-    config = json.load(open(os.path.dirname(os.path.realpath(__file__)) + '/../config.json'))
+    config = json.load(open(os.path.dirname(os.path.dirname(__file__))+'/config.json'))
 
     # Please find your API credentials here: https://www.datalanche.com/account before use            
     YOUR_API_KEY = config['api_key']

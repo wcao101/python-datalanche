@@ -43,3 +43,7 @@ nosetests.xml
 # emacs
 [#]*[#]
 .\#*
+
+# local testing script
+local_test
+local_examples
