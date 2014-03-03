@@ -47,14 +47,6 @@ curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2
                       }'
 
 echo
-echo create a new schema named my_new_schema
-curl https://api.datalanche.com/my_database/query -X POST -u "GoyY7hI2S5igDS4pG2Vdyg==:e02C96sqR5mvUoQXkCC2Gg==" -H "Content-Type: application/json" -H "Content-Type: application/json" -d '{
-                                "create_schema": "my_new_schema",
-                                "description": "An optional description of my_new_schema."
-                              }'
-
-
-echo
 echo create a new table with the name of my_table
 python ./examples/table/create_table.py
 
