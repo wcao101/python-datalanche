@@ -36,8 +36,7 @@ try:
         },
         'col2': {
             'data_type': {
-                'name': 'timestamptz',
-                'args': [ 50 ]
+                'name': 'timestamptz'
             },
             'description': 'col2 description text',
             'default_value': None,
