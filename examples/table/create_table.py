@@ -25,7 +25,7 @@ try:
 
     q = DLQuery(database='my_database') 
     q.create_table('my_schema.my_table')
-    q.description('my_table description text')
+    q.description('my_table optional description text')
     q.columns({
         'col1': {
             'data_type': {
@@ -48,7 +48,7 @@ try:
                 'name': 'text'
             },
             'description': 'col3 description text',
-            'default_value': 0,
+            'default_value': 'default text',
             'not_null': True
         },
         'col4': {
@@ -57,8 +57,6 @@ try:
                 'args': [ 50 ]
             },
             'description': 'col4 description text',
-            'default_value': None,
-            'not_null': False
         },
     })
 
