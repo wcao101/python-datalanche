@@ -55,7 +55,7 @@ try:
                 'name': 'varchar',
                 'args': [ 50 ]
             },
-            'description': 'col4 description text',
+            'description': 'col4 description text'
         },
     })
 
